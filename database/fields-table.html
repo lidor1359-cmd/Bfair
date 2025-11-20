@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מבנה מסד נתונים - דגמי רכב</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .category {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            text-align: right;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .field-name {
+            font-family: monospace;
+            background: #e8e8e8;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .type-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .type-int { background: #e3f2fd; color: #1565c0; }
+        .type-text { background: #f3e5f5; color: #7b1fa2; }
+        .type-bool { background: #fff3e0; color: #e65100; }
+        .type-decimal { background: #e8f5e9; color: #2e7d32; }
+
+        .dropdown-level {
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .nav a:hover {
+            background: #f0f0f0;
+        }
+
+        @media (max-width: 768px) {
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מבנה מסד נתונים - דגמי רכב WLTP</h1>
+        <p class="subtitle">Resource ID: 142afde2-6228-49f9-8a29-9b6c3a0cbe40 | ~93,850 רשומות</p>
+
+        <nav class="nav">
+            <a href="#identification">זיהוי</a>
+            <a href="#specs">מפרט בסיסי</a>
+            <a href="#fuel">דלק והנעה</a>
+            <a href="#towing">גרירה</a>
+            <a href="#emissions">פליטות</a>
+            <a href="#environmental">סביבה</a>
+            <a href="#equipment">אבזור</a>
+            <a href="#safety">בטיחות ADAS</a>
+            <a href="#ratings">דירוגים</a>
+        </nav>
+
+        <!-- Identification -->
+        <div class="category" id="identification">
+            <div class="category-header">1. שדות זיהוי (לבחירה בדרופדאון)</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                    <th>רמת דרופדאון</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">tozeret_cd</span></td>
+                    <td>קוד יצרן</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>קוד ייחודי ליצרן</td>
+                    <td><span class="dropdown-level">1</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">tozeret_nm</span></td>
+                    <td>שם יצרן</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>שם היצרן בעברית</td>
+                    <td><span class="dropdown-level">1</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">tozeret_eretz_nm</span></td>
+                    <td>ארץ ייצור</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>מדינת מקור</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">tozar</span></td>
+                    <td>מותג</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>שם המותג</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">degem_cd</span></td>
+                    <td>קוד דגם</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>קוד ייחודי לדגם</td>
+                    <td><span class="dropdown-level">2</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">degem_nm</span></td>
+                    <td>שם דגם טכני</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>שם טכני של הדגם</td>
+                    <td><span class="dropdown-level">2</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">kinuy_mishari</span></td>
+                    <td>כינוי מסחרי</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>שם מסחרי (Corolla, Civic)</td>
+                    <td><span class="dropdown-level">2</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">sug_degem</span></td>
+                    <td>סוג דגם</td>
+                    <td><span class="type-badge type-text">CHAR</span></td>
+                    <td>M=פרטי, N=מסחרי</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">shnat_yitzur</span></td>
+                    <td>שנת ייצור</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>שנת הייצור</td>
+                    <td><span class="dropdown-level">3</span></td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">ramat_gimur</span></td>
+                    <td>רמת גימור</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>רמת גימור (COMFORT, STYLE)</td>
+                    <td><span class="dropdown-level">4</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Basic Specs -->
+        <div class="category" id="specs">
+            <div class="category-header">2. מפרט בסיסי</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">nefah_manoa</span></td>
+                    <td>נפח מנוע</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>נפח מנוע בסמ"ק</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">koah_sus</span></td>
+                    <td>כוח סוס</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>הספק במונחי כ"ס</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">mishkal_kolel</span></td>
+                    <td>משקל כולל</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>משקל כולל בק"ג</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">gova</span></td>
+                    <td>גובה</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>גובה הרכב במ"מ</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">mispar_dlatot</span></td>
+                    <td>מספר דלתות</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>מספר דלתות</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">mispar_moshavim</span></td>
+                    <td>מספר מושבים</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>מספר מקומות ישיבה</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">merkav</span></td>
+                    <td>מרכב</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>סוג מרכב (סדאן, SUV)</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Fuel & Drivetrain -->
+        <div class="category" id="fuel">
+            <div class="category-header">3. דלק והנעה</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">delek_cd</span></td>
+                    <td>קוד דלק</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>1=בנזין, 2=דיזל, 3=חשמל, 7=היברידי</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">delek_nm</span></td>
+                    <td>סוג דלק</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>שם סוג הדלק</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">hanaa_nm</span></td>
+                    <td>סוג הנעה</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>4x4, 4x2 וכו'</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">technologiat_hanaa_nm</span></td>
+                    <td>טכנולוגיית הנעה</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>רגילה, היברידית, חשמלית</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">automatic_ind</span></td>
+                    <td>גיר אוטומטי</td>
+                    <td><span class="type-badge type-bool">BOOL</span></td>
+                    <td>1=אוטומטי, 0=ידני</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">sug_mamir_nm</span></td>
+                    <td>סוג ממיר</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>סוג תיבת הילוכים</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Towing -->
+        <div class="category" id="towing">
+            <div class="category-header">4. כושר גרירה</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">kosher_grira_im_blamim</span></td>
+                    <td>כושר גרירה עם בלמים</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>משקל מקסימלי לגרירה עם בלמים (ק"ג)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">kosher_grira_bli_blamim</span></td>
+                    <td>כושר גרירה בלי בלמים</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>משקל מקסימלי לגרירה ללא בלמים (ק"ג)</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Emissions -->
+        <div class="category" id="emissions">
+            <div class="category-header">5. פליטות WLTP</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">CO2_WLTP</span></td>
+                    <td>פליטת CO2</td>
+                    <td><span class="type-badge type-decimal">DECIMAL</span></td>
+                    <td>פחמן דו-חמצני (גרם/ק"מ)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">HC_WLTP</span></td>
+                    <td>פליטת HC</td>
+                    <td><span class="type-badge type-decimal">DECIMAL</span></td>
+                    <td>פחמימנים (מ"ג/ק"מ)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">PM_WLTP</span></td>
+                    <td>חלקיקים</td>
+                    <td><span class="type-badge type-decimal">DECIMAL</span></td>
+                    <td>חלקיקים (מ"ג/ק"מ)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">NOX_WLTP</span></td>
+                    <td>תחמוצות חנקן</td>
+                    <td><span class="type-badge type-decimal">DECIMAL</span></td>
+                    <td>NOx (מ"ג/ק"מ)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">CO_WLTP</span></td>
+                    <td>פחמן חד-חמצני</td>
+                    <td><span class="type-badge type-decimal">DECIMAL</span></td>
+                    <td>CO (מ"ג/ק"מ)</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Environmental -->
+        <div class="category" id="environmental">
+            <div class="category-header">6. דירוג סביבתי</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">madad_yarok</span></td>
+                    <td>מדד ירוק</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>מדד ירוק (נמוך יותר = טוב יותר)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">kvutzat_zihum</span></td>
+                    <td>קבוצת זיהום</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>קבוצת זיהום (1-15)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">kvuzat_agra_cd</span></td>
+                    <td>קבוצת אגרה</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>קבוצת מיסוי</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Equipment -->
+        <div class="category" id="equipment">
+            <div class="category-header">7. אבזור סטנדרטי (1=כן, 0=לא)</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">mazgan_ind</span></td>
+                    <td>מזגן</td>
+                    <td>מיזוג אוויר</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">abs_ind</span></td>
+                    <td>ABS</td>
+                    <td>מערכת בלמים אנטי-נעילה</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">hege_koah_ind</span></td>
+                    <td>הגה כוח</td>
+                    <td>הגה כוח</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">halon_bagg_ind</span></td>
+                    <td>חלון גג</td>
+                    <td>גג שמש</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">galgaley_sagsoget_kala_ind</span></td>
+                    <td>גלגלי סגסוגת</td>
+                    <td>חישוקי אלומיניום</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">matzlemat_reverse_ind</span></td>
+                    <td>מצלמת רוורס</td>
+                    <td>מצלמה אחורית</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">bakarat_yatzivut_ind</span></td>
+                    <td>בקרת יציבות</td>
+                    <td>ESC/ESP</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">mispar_kariot_avir</span></td>
+                    <td>מספר כריות אוויר</td>
+                    <td>כמות כריות אוויר</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">mispar_halonot_hashmal</span></td>
+                    <td>חלונות חשמליים</td>
+                    <td>כמות חלונות חשמליים</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Safety ADAS -->
+        <div class="category" id="safety">
+            <div class="category-header">8. מערכות בטיחות ADAS</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">bakarat_stiya_menativ_ind</span></td>
+                    <td>בקרת סטייה מנתיב</td>
+                    <td>התרעת סטייה מנתיב</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">nitur_merhak_milfanim_ind</span></td>
+                    <td>ניטור מרחק מלפנים</td>
+                    <td>התרעת התנגשות קדמית</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">zihuy_beshetah_nistar_ind</span></td>
+                    <td>זיהוי בשטח נסתר</td>
+                    <td>זיהוי שטח מת</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">bakarat_shyut_adaptivit_ind</span></td>
+                    <td>בקרת שיוט אדפטיבית</td>
+                    <td>שיוט אדפטיבי</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">zihuy_holchey_regel_ind</span></td>
+                    <td>זיהוי הולכי רגל</td>
+                    <td>זיהוי הולכי רגל</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">maarechet_ezer_labalam_ind</span></td>
+                    <td>מערכת עזר לבלם</td>
+                    <td>סיוע בלימה</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">teura_automatit_benesiya_kadima_ind</span></td>
+                    <td>בלימת חירום אוטומטית</td>
+                    <td>AEB</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">shlita_automatit_beorot_gvohim_ind</span></td>
+                    <td>שליטה באורות גבוהים</td>
+                    <td>אורות גבוהים אוטומטיים</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">zihuy_tamrurey_tnua_ind</span></td>
+                    <td>זיהוי תמרורים</td>
+                    <td>זיהוי תמרורי תנועה</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">bakarat_stiya_activ_s</span></td>
+                    <td>בקרת סטייה אקטיבית</td>
+                    <td>שמירה בנתיב אקטיבית</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Ratings -->
+        <div class="category" id="ratings">
+            <div class="category-header">9. דירוגי בטיחות</div>
+            <table>
+                <tr>
+                    <th>שדה</th>
+                    <th>עברית</th>
+                    <th>סוג</th>
+                    <th>תיאור</th>
+                </tr>
+                <tr>
+                    <td><span class="field-name">nikud_betihut</span></td>
+                    <td>ניקוד בטיחות</td>
+                    <td><span class="type-badge type-decimal">DECIMAL</span></td>
+                    <td>ציון בטיחות (0-5 כוכבים)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">ramat_eivzur_betihuty</span></td>
+                    <td>רמת אבזור בטיחותי</td>
+                    <td><span class="type-badge type-int">INTEGER</span></td>
+                    <td>רמת אבזור בטיחותי (1-5)</td>
+                </tr>
+                <tr>
+                    <td><span class="field-name">sug_tkina_nm</span></td>
+                    <td>תקן</td>
+                    <td><span class="type-badge type-text">TEXT</span></td>
+                    <td>סוג תקן (אירופאית)</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</body>
+</html>
