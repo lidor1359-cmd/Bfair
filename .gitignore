@@ -4,3 +4,4 @@ node_modules/
 *.traineddata
 test.jpg
 WhatsApp*.jpeg
+.vercel
