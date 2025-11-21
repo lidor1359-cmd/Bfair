@@ -262,6 +262,8 @@
                     extractedPlate.classList.remove('hidden');
                     searchExtractedBtn.textContent = 'חפש רכב';
                     searchExtractedBtn.disabled = false;
+                    // Auto-search when plate is detected
+                    searchVehicle(extractedPlateNumber);
                 } else {
                     alert(data.error || 'לא זוהתה לוחית רישוי בתמונה');
                     searchExtractedBtn.textContent = 'חפש רכב';
