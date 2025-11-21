@@ -159,6 +159,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const VEHICLE_REGISTRATION = '053cea08-09bc-40ec-8f7a-156f0677aff3';
         const WLTP_SPECS = '142afde2-6228-49f9-8a29-9b6c3a0cbe40';
         const STRUCTURAL_CHANGES = '56063a99-8a3e-4ff4-912e-5966c0279bad';
+        const OWNERSHIP_HISTORY = 'bb2355dc-9ec7-4f06-9c3f-3344672171da';
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -195,6 +196,24 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const structuralData = await structuralResponse.json();
         if (structuralData.success && structuralData.result.records.length > 0) {
             structuralChanges = structuralData.result.records[0];
+        }
+
+        // 4. Get ownership history (count hands)
+        let ownershipCount = 0;
+        let lastOwnershipChange = null;
+        const ownershipResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${OWNERSHIP_HISTORY}&filters={"mispar_rechev":${plateNumber}}&sort=baalut_dt desc`
+        );
+        const ownershipData = await ownershipResponse.json();
+        if (ownershipData.success && ownershipData.result.records.length > 0) {
+            ownershipCount = ownershipData.result.records.length;
+            const lastChange = ownershipData.result.records[0];
+            if (lastChange.baalut_dt) {
+                const dtStr = lastChange.baalut_dt.toString();
+                const year = dtStr.substring(0, 4);
+                const month = dtStr.substring(4, 6);
+                lastOwnershipChange = `${month}/${year}`;
+            }
         }
 
         // Combine all data
@@ -234,7 +253,11 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 kilometer: structuralChanges?.kilometer_test_aharon,
                 shinui_mivne: structuralChanges?.shinui_mivne_ind,
                 shinui_tzeva: structuralChanges?.shnui_zeva_ind,
-                rishum_rishon: structuralChanges?.rishum_rishon_dt
+                rishum_rishon: structuralChanges?.rishum_rishon_dt,
+
+                // Ownership history
+                mispar_yadayim: ownershipCount,
+                shinui_baalut_acharon: lastOwnershipChange
             }
         });
 
