@@ -438,7 +438,12 @@
                             } else if (key === 'rechev_butal') {
                                 displayValue = isWarning ? 'בוטל' : 'רשום';
                             } else if (key === 'tipul_baichor') {
-                                displayValue = isWarning ? 'פג תוקף' : 'בתוקף';
+                                let dateStr = '';
+                                if (vehicle.tokef_dt) {
+                                    const date = new Date(vehicle.tokef_dt);
+                                    if (!isNaN(date)) dateStr = ' (' + date.toLocaleDateString('he-IL') + ')';
+                                }
+                                displayValue = isWarning ? 'פג תוקף' + dateStr : 'בתוקף' + dateStr;
                             }
 
                             items += `<div class="flex justify-between items-center py-1 border-b border-surface-light last:border-0">
