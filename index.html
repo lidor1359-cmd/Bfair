@@ -201,11 +201,11 @@
             // Ownership
             'mispar_yadayim': 'מספר ידיים',
             'shinui_baalut_acharon': 'שינוי בעלות אחרון',
-            // Warnings
-            'rechev_lo_pail': 'רכב לא פעיל',
-            'rechev_butal': 'רכב בוטל',
+            // Status
+            'rechev_lo_pail': 'פעילות הרכב',
+            'rechev_butal': 'סטטוס רישום',
             'taarich_bitul': 'תאריך ביטול',
-            'tipul_baichor': 'טיפול באיחור'
+            'tipul_baichor': 'תוקף טסט'
         };
 
         // Tab switching
@@ -430,8 +430,17 @@
                         if (warningFields.includes(key)) {
                             const isWarning = value === true;
                             const textColor = isWarning ? 'text-red-500' : 'text-green-500';
-                            const icon = isWarning ? 'warning' : 'check_circle';
-                            displayValue = isWarning ? 'התראה' : 'תקין';
+                            const icon = isWarning ? 'cancel' : 'check_circle';
+
+                            // Custom display values per field
+                            if (key === 'rechev_lo_pail') {
+                                displayValue = isWarning ? 'לא פעיל' : 'פעיל';
+                            } else if (key === 'rechev_butal') {
+                                displayValue = isWarning ? 'בוטל' : 'רשום';
+                            } else if (key === 'tipul_baichor') {
+                                displayValue = isWarning ? 'פג תוקף' : 'בתוקף';
+                            }
+
                             items += `<div class="flex justify-between items-center py-1 border-b border-surface-light last:border-0">
                                 <span class="text-sm text-text-muted-light">${label}</span>
                                 <span class="flex items-center gap-1 ${textColor} font-medium text-sm">
