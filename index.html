@@ -377,69 +377,101 @@
         function displayResults(vehicle) {
             const plateNumber = vehicle.mispar_rechev || licensePlateInput.value;
 
-            let infoItems = '';
+            // Define categories
+            const categories = {
+                'התראות': {
+                    icon: 'warning',
+                    fields: ['rechev_lo_pail', 'rechev_butal', 'tipul_baichor', 'taarich_bitul']
+                },
+                'מידע בסיסי': {
+                    icon: 'directions_car',
+                    fields: ['tozeret_nm', 'kinuy_mishari', 'degem_nm', 'shnat_yitzur', 'tzeva_rechev', 'sug_delek_nm', 'baalut', 'ramat_gimur', 'merkav']
+                },
+                'מפרט טכני': {
+                    icon: 'settings',
+                    fields: ['koah_sus', 'nefah_manoa', 'mishkal_kolel', 'mispar_dlatot', 'mispar_moshavim', 'automatic_ind', 'zmig_kidmi', 'zmig_ahori']
+                },
+                'רישוי ובדיקות': {
+                    icon: 'verified',
+                    fields: ['tokef_dt', 'misgeret', 'moed_aliya_lakvish', 'rishum_rishon', 'madad_yarok', 'kvutzat_zihum']
+                },
+                'בעלות והיסטוריה': {
+                    icon: 'history',
+                    fields: ['mispar_yadayim', 'shinui_baalut_acharon', 'kilometer', 'shinui_mivne', 'shinui_tzeva']
+                }
+            };
 
-            for (const [key, value] of Object.entries(vehicle)) {
-                if (value && key !== '_id' && key !== 'rank') {
-                    const label = fieldLabels[key] || key;
-                    let displayValue = value;
+            function formatValue(key, value) {
+                let displayValue = value;
+                if (key.includes('_dt') && value) {
+                    const date = new Date(value);
+                    if (!isNaN(date)) displayValue = date.toLocaleDateString('he-IL');
+                }
+                if (key === 'automatic_ind') displayValue = value === 1 || value === 'A' ? 'כן' : 'לא';
+                if (key === 'shinui_mivne' || key === 'shinui_tzeva') displayValue = value === 1 ? 'כן' : 'לא';
+                if (key === 'kilometer' && value) displayValue = value.toLocaleString('he-IL') + ' ק"מ';
+                return displayValue;
+            }
 
-                    if (key.includes('_dt') && value) {
-                        const date = new Date(value);
-                        if (!isNaN(date)) {
-                            displayValue = date.toLocaleDateString('he-IL');
+            let categoriesHTML = '';
+            const warningFields = ['rechev_lo_pail', 'rechev_butal', 'tipul_baichor'];
+
+            for (const [catName, catData] of Object.entries(categories)) {
+                let items = '';
+                let hasItems = false;
+
+                for (const key of catData.fields) {
+                    const value = vehicle[key];
+                    if (value !== undefined && value !== null) {
+                        hasItems = true;
+                        const label = fieldLabels[key] || key;
+                        let displayValue = formatValue(key, value);
+
+                        if (warningFields.includes(key)) {
+                            const isWarning = value === true;
+                            const textColor = isWarning ? 'text-red-500' : 'text-green-500';
+                            const icon = isWarning ? 'warning' : 'check_circle';
+                            displayValue = isWarning ? 'התראה' : 'תקין';
+                            items += `<div class="flex justify-between items-center py-1 border-b border-surface-light last:border-0">
+                                <span class="text-sm text-text-muted-light">${label}</span>
+                                <span class="flex items-center gap-1 ${textColor} font-medium text-sm">
+                                    <span class="material-symbols-outlined text-base">${icon}</span>${displayValue}
+                                </span>
+                            </div>`;
+                        } else {
+                            items += `<div class="flex justify-between items-center py-1 border-b border-surface-light last:border-0">
+                                <span class="text-sm text-text-muted-light">${label}</span>
+                                <span class="font-medium text-sm text-text-light">${displayValue}</span>
+                            </div>`;
                         }
                     }
+                }
 
-                    if (key === 'automatic_ind') {
-                        displayValue = value === 1 || value === 'A' ? 'כן' : 'לא';
-                    }
-
-                    if (key === 'shinui_mivne' || key === 'shinui_tzeva') {
-                        displayValue = value === 1 ? 'כן' : 'לא';
-                    }
-
-                    if (key === 'kilometer' && value) {
-                        displayValue = value.toLocaleString('he-IL') + ' ק"מ';
-                    }
-
-                    // Warning fields - special styling
-                    const warningFields = ['rechev_lo_pail', 'rechev_butal', 'tipul_baichor'];
-                    if (warningFields.includes(key)) {
-                        const isWarning = value === true;
-                        const bgColor = isWarning ? 'bg-red-500/20 border-red-500' : 'bg-green-500/20 border-green-500';
-                        const textColor = isWarning ? 'text-red-500' : 'text-green-500';
-                        const icon = isWarning ? 'warning' : 'check_circle';
-                        displayValue = isWarning ? 'כן - התראה!' : 'תקין';
-
-                        infoItems += `
-                            <div class="group flex flex-col overflow-hidden rounded-xl border ${bgColor} shadow-sm transition-shadow hover:shadow-lg p-4">
-                                <p class="text-sm font-medium text-text-muted-light mb-1">${label}</p>
+                if (hasItems) {
+                    categoriesHTML += `
+                        <div class="rounded-lg border border-surface-light bg-background-light overflow-hidden">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.expand-icon').classList.toggle('rotate-180')"
+                                    class="w-full flex items-center justify-between p-3 hover:bg-surface-light/50 transition-colors">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined ${textColor}">${icon}</span>
-                                    <p class="text-lg font-bold ${textColor}">${displayValue}</p>
+                                    <span class="material-symbols-outlined text-primary">${catData.icon}</span>
+                                    <span class="font-semibold text-text-light">${catName}</span>
                                 </div>
-                            </div>
-                        `;
-                    } else {
-                        infoItems += `
-                            <div class="group flex flex-col overflow-hidden rounded-xl border border-surface-light bg-background-light shadow-sm transition-shadow hover:shadow-lg p-4">
-                                <p class="text-sm font-medium text-text-muted-light mb-1">${label}</p>
-                                <p class="text-lg font-bold text-text-light">${displayValue}</p>
-                            </div>
-                        `;
-                    }
+                                <span class="material-symbols-outlined expand-icon transition-transform">expand_more</span>
+                            </button>
+                            <div class="hidden px-3 pb-3">${items}</div>
+                        </div>
+                    `;
                 }
             }
 
             resultsContent.innerHTML = `
-                <div class="rounded-lg bg-surface-light p-6 mb-6">
-                    <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="rounded-lg bg-surface-light p-4 mb-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-col">
-                            <p class="text-[28px] font-bold leading-tight tracking-tight text-text-light">
+                            <p class="text-xl font-bold text-text-light">
                                 ${vehicle.tozeret_nm || ''} ${vehicle.kinuy_mishari || ''}
                             </p>
-                            <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-muted-light">
+                            <div class="mt-1 flex flex-wrap gap-x-3 text-sm text-text-muted-light">
                                 <span>${vehicle.shnat_yitzur || ''}</span>
                                 <span>•</span>
                                 <span>${vehicle.tzeva_rechev || ''}</span>
@@ -447,11 +479,11 @@
                                 <span>${vehicle.sug_delek_nm || ''}</span>
                             </div>
                         </div>
-                        <span class="bg-primary text-text-light px-6 py-3 rounded-lg text-2xl font-extrabold tracking-widest" style="direction: ltr;">${plateNumber}</span>
+                        <span class="bg-primary text-text-light px-4 py-2 rounded-lg text-xl font-extrabold tracking-widest" style="direction: ltr;">${plateNumber}</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    ${infoItems}
+                <div class="flex flex-col gap-2">
+                    ${categoriesHTML}
                 </div>
             `;
         }
