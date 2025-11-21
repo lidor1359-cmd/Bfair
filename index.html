@@ -183,7 +183,21 @@
             'degem_cd': 'קוד דגם',
             'tzeva_cd': 'קוד צבע',
             'sug_degem': 'סוג דגם',
-            'ramat_eivzur_betihuty': 'רמת אבזור בטיחותי'
+            'ramat_eivzur_betihuty': 'רמת אבזור בטיחותי',
+            // WLTP specs
+            'koah_sus': 'כוח סוס',
+            'nefah_manoa': 'נפח מנוע (סמ"ק)',
+            'mishkal_kolel': 'משקל כולל (ק"ג)',
+            'mispar_dlatot': 'מספר דלתות',
+            'mispar_moshavim': 'מספר מושבים',
+            'automatic_ind': 'אוטומטי',
+            'merkav': 'סוג מרכב',
+            'madad_yarok': 'מדד ירוק',
+            // Structural changes
+            'kilometer': 'קילומטראז אחרון',
+            'shinui_mivne': 'שינוי מבנה',
+            'shinui_tzeva': 'שינוי צבע',
+            'rishum_rishon': 'רישום ראשון'
         };
 
         // Tab switching
@@ -321,28 +335,20 @@
             resultsSection.scrollIntoView({ behavior: 'smooth' });
 
             try {
-                const filters = JSON.stringify({ mispar_rechev: parseInt(licensePlate) });
-                const url = `${API_BASE}?resource_id=${RESOURCE_ID}&filters=${encodeURIComponent(filters)}&limit=1`;
-                const response = await fetch(url);
+                const response = await fetch(`/api/vehicle/${licensePlate}`);
                 const data = await response.json();
 
                 if (!data.success) {
-                    throw new Error('API request failed');
-                }
-
-                const records = data.result.records;
-
-                if (records.length === 0) {
                     resultsContent.innerHTML = `
                         <div class="text-center py-12">
                             <span class="material-symbols-outlined text-5xl text-text-muted-light mb-4">search_off</span>
-                            <p class="text-text-muted-light">לא נמצאו תוצאות עבור מספר רישוי: ${licensePlate}</p>
+                            <p class="text-text-muted-light">${data.error || 'לא נמצאו תוצאות עבור מספר רישוי: ' + licensePlate}</p>
                         </div>
                     `;
                     return;
                 }
 
-                displayResults(records[0]);
+                displayResults(data.data);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -378,7 +384,15 @@
                     }
 
                     if (key === 'automatic_ind') {
-                        displayValue = value === 'A' ? 'כן' : 'לא';
+                        displayValue = value === 1 || value === 'A' ? 'כן' : 'לא';
+                    }
+
+                    if (key === 'shinui_mivne' || key === 'shinui_tzeva') {
+                        displayValue = value === 1 ? 'כן' : 'לא';
+                    }
+
+                    if (key === 'kilometer' && value) {
+                        displayValue = value.toLocaleString('he-IL') + ' ק"מ';
                     }
 
                     infoItems += `

@@ -76,8 +76,8 @@ function extractLicensePlate(text) {
             const index = match.index;
 
             // Skip phone numbers (1-700, 1-800, etc.)
-            const precedingText = text.substring(Math.max(0, index - 3), index);
-            if (/1[-–]?\s*$/.test(precedingText)) {
+            const precedingText = text.substring(Math.max(0, index - 5), index);
+            if (/1[-–\s]*(7|8)\d{2}/.test(precedingText + plate.substring(0, 3))) {
                 continue;
             }
 
@@ -146,6 +146,103 @@ app.post('/api/extract-plate', upload.single('image'), async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to process image'
+        });
+    }
+});
+
+// Vehicle search endpoint - queries multiple government databases
+app.get('/api/vehicle/:plateNumber', async (req, res) => {
+    try {
+        const plateNumber = req.params.plateNumber.replace(/[-\s]/g, '');
+
+        // Resource IDs for government databases
+        const VEHICLE_REGISTRATION = '053cea08-09bc-40ec-8f7a-156f0677aff3';
+        const WLTP_SPECS = '142afde2-6228-49f9-8a29-9b6c3a0cbe40';
+        const STRUCTURAL_CHANGES = '56063a99-8a3e-4ff4-912e-5966c0279bad';
+
+        // 1. Get basic vehicle info
+        const vehicleResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${VEHICLE_REGISTRATION}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const vehicleData = await vehicleResponse.json();
+
+        if (!vehicleData.success || vehicleData.result.records.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'לא נמצא רכב עם מספר זה'
+            });
+        }
+
+        const vehicle = vehicleData.result.records[0];
+
+        // 2. Get WLTP specs using tozeret_cd, degem_cd, and shnat_yitzur
+        let wltpSpecs = null;
+        if (vehicle.tozeret_cd && vehicle.degem_cd) {
+            const wltpResponse = await fetch(
+                `https://data.gov.il/api/3/action/datastore_search?resource_id=${WLTP_SPECS}&filters={"tozeret_cd":${vehicle.tozeret_cd},"degem_cd":${vehicle.degem_cd},"shnat_yitzur":${vehicle.shnat_yitzur}}&limit=1`
+            );
+            const wltpData = await wltpResponse.json();
+            if (wltpData.success && wltpData.result.records.length > 0) {
+                wltpSpecs = wltpData.result.records[0];
+            }
+        }
+
+        // 3. Get structural changes (mileage, modifications)
+        let structuralChanges = null;
+        const structuralResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${STRUCTURAL_CHANGES}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const structuralData = await structuralResponse.json();
+        if (structuralData.success && structuralData.result.records.length > 0) {
+            structuralChanges = structuralData.result.records[0];
+        }
+
+        // Combine all data
+        res.json({
+            success: true,
+            data: {
+                // Basic info
+                mispar_rechev: vehicle.mispar_rechev,
+                tozeret_nm: vehicle.tozeret_nm,
+                kinuy_mishari: vehicle.kinuy_mishari,
+                degem_nm: vehicle.degem_nm,
+                shnat_yitzur: vehicle.shnat_yitzur,
+                tzeva_rechev: vehicle.tzeva_rechev,
+                sug_delek_nm: vehicle.sug_delek_nm,
+                baalut: vehicle.baalut,
+                ramat_gimur: vehicle.ramat_gimur,
+                misgeret: vehicle.misgeret,
+                moed_aliya_lakvish: vehicle.moed_aliya_lakvish,
+                tokef_dt: vehicle.tokef_dt,
+
+                // Tires
+                zmig_kidmi: vehicle.zmig_kidmi,
+                zmig_ahori: vehicle.zmig_ahori,
+
+                // WLTP specs
+                koah_sus: wltpSpecs?.koah_sus,
+                nefah_manoa: wltpSpecs?.nefah_manoa,
+                mishkal_kolel: wltpSpecs?.mishkal_kolel,
+                mispar_dlatot: wltpSpecs?.mispar_dlatot,
+                mispar_moshavim: wltpSpecs?.mispar_moshavim,
+                automatic_ind: wltpSpecs?.automatic_ind,
+                merkav: wltpSpecs?.merkav,
+                madad_yarok: wltpSpecs?.madad_yarok,
+                kvutzat_zihum: wltpSpecs?.kvutzat_zihum,
+
+                // Structural changes
+                kilometer: structuralChanges?.kilometer_test_aharon,
+                shinui_mivne: structuralChanges?.shinui_mivne_ind,
+                shinui_tzeva: structuralChanges?.shnui_zeva_ind,
+                rishum_rishon: structuralChanges?.rishum_rishon_dt
+            }
+        });
+
+    } catch (error) {
+        console.error('Vehicle search error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'שגיאה בחיפוש רכב'
         });
     }
 });
