@@ -200,7 +200,12 @@
             'rishum_rishon': 'רישום ראשון',
             // Ownership
             'mispar_yadayim': 'מספר ידיים',
-            'shinui_baalut_acharon': 'שינוי בעלות אחרון'
+            'shinui_baalut_acharon': 'שינוי בעלות אחרון',
+            // Warnings
+            'rechev_lo_pail': 'רכב לא פעיל',
+            'rechev_butal': 'רכב בוטל',
+            'taarich_bitul': 'תאריך ביטול',
+            'tipul_baichor': 'טיפול באיחור'
         };
 
         // Tab switching
@@ -398,12 +403,32 @@
                         displayValue = value.toLocaleString('he-IL') + ' ק"מ';
                     }
 
-                    infoItems += `
-                        <div class="group flex flex-col overflow-hidden rounded-xl border border-surface-light bg-background-light shadow-sm transition-shadow hover:shadow-lg p-4">
-                            <p class="text-sm font-medium text-text-muted-light mb-1">${label}</p>
-                            <p class="text-lg font-bold text-text-light">${displayValue}</p>
-                        </div>
-                    `;
+                    // Warning fields - special styling
+                    const warningFields = ['rechev_lo_pail', 'rechev_butal', 'tipul_baichor'];
+                    if (warningFields.includes(key)) {
+                        const isWarning = value === true;
+                        const bgColor = isWarning ? 'bg-red-500/20 border-red-500' : 'bg-green-500/20 border-green-500';
+                        const textColor = isWarning ? 'text-red-500' : 'text-green-500';
+                        const icon = isWarning ? 'warning' : 'check_circle';
+                        displayValue = isWarning ? 'כן - התראה!' : 'תקין';
+
+                        infoItems += `
+                            <div class="group flex flex-col overflow-hidden rounded-xl border ${bgColor} shadow-sm transition-shadow hover:shadow-lg p-4">
+                                <p class="text-sm font-medium text-text-muted-light mb-1">${label}</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined ${textColor}">${icon}</span>
+                                    <p class="text-lg font-bold ${textColor}">${displayValue}</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        infoItems += `
+                            <div class="group flex flex-col overflow-hidden rounded-xl border border-surface-light bg-background-light shadow-sm transition-shadow hover:shadow-lg p-4">
+                                <p class="text-sm font-medium text-text-muted-light mb-1">${label}</p>
+                                <p class="text-lg font-bold text-text-light">${displayValue}</p>
+                            </div>
+                        `;
+                    }
                 }
             }
 

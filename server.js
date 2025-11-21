@@ -160,6 +160,8 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const WLTP_SPECS = '142afde2-6228-49f9-8a29-9b6c3a0cbe40';
         const STRUCTURAL_CHANGES = '56063a99-8a3e-4ff4-912e-5966c0279bad';
         const OWNERSHIP_HISTORY = 'bb2355dc-9ec7-4f06-9c3f-3344672171da';
+        const INACTIVE_VEHICLES = 'f6efe89a-fb3d-43a4-bb61-9bf12a9b9099';
+        const SCRAPPED_VEHICLES = '851ecab1-0622-4dbe-a6c7-f950cf82abf9';
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -216,6 +218,35 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             }
         }
 
+        // 5. Check if vehicle is inactive (expired license)
+        let isInactive = false;
+        const inactiveResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${INACTIVE_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
+        );
+        const inactiveData = await inactiveResponse.json();
+        if (inactiveData.success && inactiveData.result.records.length > 0) {
+            isInactive = true;
+        }
+
+        // 6. Check if vehicle is scrapped
+        let isScrapped = false;
+        let scrappedDate = null;
+        const scrappedResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${SCRAPPED_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
+        );
+        const scrappedData = await scrappedResponse.json();
+        if (scrappedData.success && scrappedData.result.records.length > 0) {
+            isScrapped = true;
+            scrappedDate = scrappedData.result.records[0].bitul_dt;
+        }
+
+        // Calculate if service is overdue
+        let serviceOverdue = false;
+        if (vehicle.tokef_dt) {
+            const tokefDate = new Date(vehicle.tokef_dt);
+            serviceOverdue = tokefDate < new Date();
+        }
+
         // Combine all data
         res.json({
             success: true,
@@ -257,7 +288,13 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
 
                 // Ownership history
                 mispar_yadayim: ownershipCount,
-                shinui_baalut_acharon: lastOwnershipChange
+                shinui_baalut_acharon: lastOwnershipChange,
+
+                // Warnings/Flags
+                rechev_lo_pail: isInactive,
+                rechev_butal: isScrapped,
+                taarich_bitul: scrappedDate,
+                tipul_baichor: serviceOverdue
             }
         });
 
