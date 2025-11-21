@@ -57,6 +57,12 @@ async function extractTextFromImage(imageBuffer) {
 
 // Extract Israeli license plate pattern
 function extractLicensePlate(text) {
+    // Remove phone number patterns first
+    const cleanedText = text
+        .replace(/1[-–]?7\d{2}[-–]?\d{3}[-–]?\d{3}/g, '')  // 1-700-xxx-xxx
+        .replace(/1[-–]?8\d{2}[-–]?\d{3}[-–]?\d{3}/g, '')  // 1-800-xxx-xxx
+        .replace(/0\d[-–]?\d{7}/g, '');                     // 0x-xxxxxxx
+
     // Israeli license plate patterns - prioritize formatted ones
     const patterns = [
         // With dashes/spaces (most reliable)
@@ -74,7 +80,7 @@ function extractLicensePlate(text) {
     let allMatches = [];
 
     for (const pattern of patterns) {
-        const matches = text.matchAll(pattern);
+        const matches = cleanedText.matchAll(pattern);
         for (const match of matches) {
             const plate = match[1].replace(/[-–\s]/g, '');
             // Validate it's 7 or 8 digits
