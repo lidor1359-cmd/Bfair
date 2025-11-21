@@ -6,15 +6,15 @@
       "use": "@vercel/node"
     },
     {
-      "src": "index.html",
+      "src": "**/*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "database/**",
+      "src": "**/*.jpeg",
       "use": "@vercel/static"
     },
     {
-      "src": "logo.jpeg",
+      "src": "**/*.jpg",
       "use": "@vercel/static"
     }
   ],
@@ -24,12 +24,7 @@
       "dest": "server.js"
     },
     {
-      "src": "/database/(.*)",
-      "dest": "/database/$1"
-    },
-    {
-      "src": "/logo.jpeg",
-      "dest": "/logo.jpeg"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
