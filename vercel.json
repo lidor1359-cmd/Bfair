@@ -8,12 +8,28 @@
     {
       "src": "index.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "database/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "logo.jpeg",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "server.js"
+    },
+    {
+      "src": "/database/(.*)",
+      "dest": "/database/$1"
+    },
+    {
+      "src": "/logo.jpeg",
+      "dest": "/logo.jpeg"
     },
     {
       "src": "/(.*)",
