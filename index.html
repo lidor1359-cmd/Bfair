@@ -317,6 +317,8 @@
                     <p class="text-text-muted-light">מחפש נתונים...</p>
                 </div>
             `;
+            // Auto-scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
 
             try {
                 const filters = JSON.stringify({ mispar_rechev: parseInt(licensePlate) });
