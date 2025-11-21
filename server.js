@@ -56,49 +56,57 @@ async function extractTextFromImage(imageBuffer) {
 }
 
 // Extract Israeli license plate pattern
+// Focuses on the most prominent plate (appears first in Vision API text)
 function extractLicensePlate(text) {
-    // Remove phone number patterns first
-    const cleanedText = text
-        .replace(/1[-–]?7\d{2}[-–]?\d{3}[-–]?\d{3}/g, '')  // 1-700-xxx-xxx
-        .replace(/1[-–]?8\d{2}[-–]?\d{3}[-–]?\d{3}/g, '')  // 1-800-xxx-xxx
-        .replace(/0\d[-–]?\d{7}/g, '');                     // 0x-xxxxxxx
-
-    // Israeli license plate patterns - prioritize formatted ones
+    // Israeli license plate patterns
     const patterns = [
-        // With dashes/spaces (most reliable)
         /(\d{3}[-–]\d{2}[-–]\d{3})/g,           // New: 123-45-678
         /(\d{2}[-–]\d{3}[-–]\d{2})/g,            // Old: 12-345-67
         /(\d{3}\s+\d{2}\s+\d{3})/g,              // With spaces
         /(\d{2}\s+\d{3}\s+\d{2})/g,              // With spaces
-        // Plain 8 digits (new format)
-        /\b(\d{8})\b/g,
-        // Plain 7 digits (old format)
-        /\b(\d{7})\b/g
     ];
 
-    // Try each pattern and collect all matches
-    let allMatches = [];
+    // Collect ALL valid formatted plates with their positions
+    let allPlates = [];
 
     for (const pattern of patterns) {
-        const matches = cleanedText.matchAll(pattern);
+        const matches = [...text.matchAll(pattern)];
         for (const match of matches) {
             const plate = match[1].replace(/[-–\s]/g, '');
-            // Validate it's 7 or 8 digits
+            const index = match.index;
+
+            // Skip phone numbers (1-700, 1-800, etc.)
+            const precedingText = text.substring(Math.max(0, index - 3), index);
+            if (/1[-–]?\s*$/.test(precedingText)) {
+                continue;
+            }
+
             if (plate.length === 7 || plate.length === 8) {
-                allMatches.push({
-                    plate,
-                    hasFormat: match[1].includes('-') || match[1].includes('–') || /\d\s+\d/.test(match[1])
-                });
+                allPlates.push({ plate, index });
             }
         }
     }
 
-    // Prefer formatted plates (with dashes)
-    const formatted = allMatches.find(m => m.hasFormat);
-    if (formatted) return formatted.plate;
+    // Return the plate that appears FIRST in the text (most prominent)
+    if (allPlates.length > 0) {
+        allPlates.sort((a, b) => a.index - b.index);
+        return allPlates[0].plate;
+    }
 
-    // Otherwise return first valid match
-    return allMatches[0]?.plate || null;
+    // Fallback to unformatted patterns
+    const fallbackPatterns = [
+        /\b(\d{8})\b/g,  // New format plain
+        /\b(\d{7})\b/g   // Old format plain
+    ];
+
+    for (const pattern of fallbackPatterns) {
+        const matches = [...text.matchAll(pattern)];
+        if (matches.length > 0) {
+            return matches[0][1];
+        }
+    }
+
+    return null;
 }
 
 // License plate extraction endpoint
