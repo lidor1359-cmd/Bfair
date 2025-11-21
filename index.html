@@ -1,411 +1,155 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html class="light" dir="rtl" lang="he">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Bfair - בדיקת רכב</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f1c822",
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#181711",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#221e10",
+                        "text-light": "#181711",
+                        "text-dark": "#f5f4f0",
+                        "text-muted-light": "#8a8260",
+                        "text-muted-dark": "#8a8260",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .search-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-
-        .search-form {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 200px;
-            padding: 16px 20px;
-            font-size: 1.2rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            direction: ltr;
-            text-align: center;
-            letter-spacing: 2px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
-        }
-
-        .search-input::placeholder {
-            letter-spacing: normal;
-            color: #999;
-        }
-
-        .search-btn {
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
-            color: #1a1a1a;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
-        }
-
-        .search-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .results-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            display: none;
-        }
-
-        .results-card.visible {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .results-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .license-badge {
-            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
-            color: #1a1a1a;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            direction: ltr;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-
-        .info-item {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 10px;
-            border-right: 4px solid #d4af37;
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f0f0f0;
-            border-top-color: #d4af37;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: #fee;
-            color: #c00;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .input-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .tab-btn.active {
-            color: #d4af37;
-        }
-
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .upload-area {
-            border: 2px dashed #e0e0e0;
-            border-radius: 10px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-
-        .upload-area:hover {
-            border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.05);
-        }
-
-        .upload-area.dragover {
-            border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        .upload-text {
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .upload-hint {
-            font-size: 0.85rem;
-            color: #999;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .preview-container {
-            display: none;
-            margin-bottom: 15px;
-        }
-
-        .preview-container.visible {
-            display: block;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .extracted-plate {
-            background: #fffbf0;
-            border: 1px solid #d4af37;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .extracted-plate-label {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .extracted-plate-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #b8962e;
-            direction: ltr;
-            letter-spacing: 2px;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-secondary {
-            padding: 12px 20px;
-            font-size: 1rem;
-            background: #f0f0f0;
-            color: #666;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .search-form {
-                flex-direction: column;
-            }
-
-            .search-btn {
-                width: 100%;
-            }
-        }
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <img src="logo.jpeg" alt="Bfair" style="max-width: 300px; margin-bottom: 15px;">
-            <p>הזן מספר רישוי או העלה תמונה לקבלת מידע מלא על הרכב</p>
-        </div>
-
-        <div class="search-card">
-            <div class="input-tabs">
-                <button class="tab-btn active" data-tab="manual">הזנה ידנית</button>
-                <button class="tab-btn" data-tab="upload">העלאת תמונה</button>
-            </div>
-
-            <!-- Manual Input Tab -->
-            <div class="tab-content active" id="manual-tab">
-                <form class="search-form" id="searchForm">
-                    <input
-                        type="text"
-                        class="search-input"
-                        id="licensePlate"
-                        placeholder="הזן מספר רישוי"
-                        maxlength="8"
-                        required
-                    >
-                    <button type="submit" class="search-btn" id="searchBtn">
-                        חפש רכב
-                    </button>
-                </form>
-            </div>
-
-            <!-- Image Upload Tab -->
-            <div class="tab-content" id="upload-tab">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📷</div>
-                    <div class="upload-text">לחץ להעלאת תמונה או גרור לכאן</div>
-                    <div class="upload-hint">JPEG, PNG או WebP עד 10MB</div>
-                    <input type="file" class="file-input" id="fileInput" accept="image/jpeg,image/png,image/webp">
-                </div>
-
-                <div class="preview-container" id="previewContainer">
-                    <img class="preview-image" id="previewImage" alt="Preview">
-                    <div class="extracted-plate" id="extractedPlate" style="display: none;">
-                        <div class="extracted-plate-label">מספר רישוי שזוהה:</div>
-                        <div class="extracted-plate-value" id="extractedPlateValue"></div>
-                    </div>
-                    <div class="btn-row">
-                        <button class="search-btn" id="searchExtractedBtn" style="flex: 1;">חפש רכב</button>
-                        <button class="btn-secondary" id="clearUploadBtn">נקה</button>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <!-- Header -->
+            <header class="sticky top-0 z-50 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm">
+                <div class="container mx-auto px-4">
+                    <div class="flex items-center justify-center whitespace-nowrap border-b border-solid border-primary/20 h-32">
+                        <div class="flex items-center gap-4">
+                            <img src="logo.jpeg" alt="Bfair" class="h-28">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </header>
 
-        <div class="results-card" id="resultsCard">
-            <div id="resultsContent"></div>
+            <main class="flex-grow">
+                <!-- Hero Section with Search -->
+                <div class="@container relative">
+                    <div class="flex min-h-[600px] flex-col gap-8 bg-cover bg-center bg-no-repeat items-center justify-center p-4 text-center" style='background-image: linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9f5JSlWMY2r9YkC6ZtbGoGfyL2Pc6Vuq5d7wCl-zXVDOQV90QsAJ9YMxXZshZs5QyhLRONshdJaxSEy_gyty-qux0vfqsoXCWpP3shZwiu2ayXCsKA9Gbm68M9wGoIsBRHKIikkq8IVJz7YtqnVbwzpGcRX0mmBIS-l_FrEHMc_tB2_xZt6YQZB4Yk8Tnzf7Cb3JieshEvpCx8i-oaA2ar5Gd0hix0u-A4LGVBVfllCtALE5f5eWohA5o1bw83N5K45pydqVISvUU");'>
+
+                        <div class="flex flex-col gap-4 max-w-3xl">
+                            <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em] md:text-6xl">בדיקת פרטי רכב</h1>
+                            <h2 class="text-white/90 text-lg font-normal leading-normal md:text-xl">הזן מספר רישוי או העלה תמונה לקבלת מידע מלא על הרכב</h2>
+                        </div>
+
+                        <!-- Search Card -->
+                        <div class="w-full max-w-3xl bg-surface-light/20 dark:bg-surface-dark/20 backdrop-blur-md p-4 rounded-xl shadow-lg">
+                            <!-- Tabs -->
+                            <div class="flex-wrap gap-4 flex justify-center mb-4">
+                                <button id="tab-manual" class="tab-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary/30 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/50 transition-colors" onclick="switchTab('manual')">
+                                    <span class="truncate">הזנה ידנית</span>
+                                </button>
+                                <button id="tab-upload" class="tab-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-background-light/30 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-background-light/50 transition-colors" onclick="switchTab('upload')">
+                                    <span class="truncate">העלאת תמונה</span>
+                                </button>
+                            </div>
+
+                            <!-- Manual Input -->
+                            <div id="manual-content" class="tab-content">
+                                <form id="searchForm">
+                                    <label class="flex flex-col h-14 w-full">
+                                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                                            <div class="text-text-light flex bg-surface-light dark:bg-surface-dark items-center justify-center pr-4 rounded-r-lg">
+                                                <span class="material-symbols-outlined">search</span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                id="licensePlate"
+                                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary border-none bg-surface-light dark:bg-surface-dark h-full placeholder:text-text-muted-light dark:placeholder:text-text-muted-dark px-4 text-base font-normal leading-normal text-center tracking-widest"
+                                                placeholder="הזן מספר רישוי"
+                                                maxlength="8"
+                                                style="direction: ltr;"
+                                                required
+                                            />
+                                            <button type="submit" id="searchBtn" class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-l-lg h-full px-5 bg-primary text-text-light text-base font-bold hover:bg-opacity-90 transition-opacity">
+                                                <span class="truncate">חיפוש</span>
+                                            </button>
+                                        </div>
+                                    </label>
+                                </form>
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div id="upload-content" class="tab-content hidden">
+                                <div id="uploadArea" class="border-2 border-dashed border-white/30 rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-all">
+                                    <span class="material-symbols-outlined text-5xl text-primary mb-3">photo_camera</span>
+                                    <p class="text-white font-medium mb-1">לחץ להעלאת תמונה או גרור לכאן</p>
+                                    <p class="text-white/70 text-sm">JPEG, PNG או WebP עד 10MB</p>
+                                    <input type="file" id="fileInput" class="hidden" accept="image/jpeg,image/png,image/webp">
+                                </div>
+
+                                <div id="previewContainer" class="hidden mt-4">
+                                    <img id="previewImage" class="w-full max-h-48 object-contain rounded-lg mb-4" alt="Preview">
+                                    <div id="extractedPlate" class="hidden bg-surface-light/90 rounded-lg p-4 mb-4">
+                                        <p class="text-text-muted-light text-sm mb-1">מספר רישוי שזוהה:</p>
+                                        <p id="extractedPlateValue" class="text-2xl font-bold text-primary tracking-widest" style="direction: ltr;"></p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button id="searchExtractedBtn" disabled class="flex-1 h-12 rounded-lg bg-primary text-text-light font-bold hover:bg-opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                                            חפש רכב
+                                        </button>
+                                        <button id="clearUploadBtn" class="h-12 px-4 rounded-lg bg-surface-light text-text-muted-light font-medium hover:bg-gray-200 transition-colors">
+                                            נקה
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <section id="resultsSection" class="hidden py-16 sm:py-24">
+                    <div class="container mx-auto px-4 max-w-4xl">
+                        <div id="resultsContent" class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg p-6">
+                            <!-- Results will be injected here -->
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-surface-dark text-background-light">
+                <div class="container mx-auto px-4 py-16">
+                    <div class="flex flex-col items-center">
+                        <img src="logo.jpeg" alt="Bfair" class="h-24 mb-4">
+                        <p class="text-text-muted-dark text-center max-w-md">בדיקת פרטי רכב מהירה ומדויקת. הזן מספר רישוי או העלה תמונה לקבלת מידע מלא.</p>
+                    </div>
+                    <div class="mt-8 border-t border-primary/20 pt-8 text-center text-text-muted-dark">
+                        <p>© 2024 Bfair. כל הזכויות שמורות.</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
@@ -442,14 +186,20 @@
             'ramat_eivzur_betihuty': 'רמת אבזור בטיחותי'
         };
 
-        const searchForm = document.getElementById('searchForm');
-        const licensePlateInput = document.getElementById('licensePlate');
-        const searchBtn = document.getElementById('searchBtn');
-        const resultsCard = document.getElementById('resultsCard');
-        const resultsContent = document.getElementById('resultsContent');
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-primary/30');
+                btn.classList.add('bg-background-light/30');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
 
-        // Upload elements
-        const tabBtns = document.querySelectorAll('.tab-btn');
+            document.getElementById(`tab-${tab}`).classList.add('bg-primary/30');
+            document.getElementById(`tab-${tab}`).classList.remove('bg-background-light/30');
+            document.getElementById(`${tab}-content`).classList.remove('hidden');
+        }
+
+        // Upload area
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const previewContainer = document.getElementById('previewContainer');
@@ -459,55 +209,39 @@
         const searchExtractedBtn = document.getElementById('searchExtractedBtn');
         const clearUploadBtn = document.getElementById('clearUploadBtn');
 
-        // Tab switching
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
-            });
-        });
-
-        // Upload area click
         uploadArea.addEventListener('click', () => fileInput.click());
 
-        // Drag and drop
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.classList.add('dragover');
+            uploadArea.classList.add('border-primary', 'bg-primary/10');
         });
 
         uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
+            uploadArea.classList.remove('border-primary', 'bg-primary/10');
         });
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.classList.remove('dragover');
+            uploadArea.classList.remove('border-primary', 'bg-primary/10');
             const file = e.dataTransfer.files[0];
             if (file) handleFileUpload(file);
         });
 
-        // File input change
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) handleFileUpload(file);
         });
 
-        // Handle file upload
         async function handleFileUpload(file) {
-            // Show preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImage.src = e.target.result;
-                previewContainer.classList.add('visible');
-                uploadArea.style.display = 'none';
+                previewContainer.classList.remove('hidden');
+                uploadArea.classList.add('hidden');
             };
             reader.readAsDataURL(file);
 
-            // Extract plate number
-            extractedPlate.style.display = 'none';
+            extractedPlate.classList.add('hidden');
             searchExtractedBtn.disabled = true;
             searchExtractedBtn.textContent = 'מזהה לוחית...';
 
@@ -525,7 +259,7 @@
                 if (data.success) {
                     extractedPlateNumber = data.licensePlate;
                     extractedPlateValue.textContent = data.licensePlate;
-                    extractedPlate.style.display = 'block';
+                    extractedPlate.classList.remove('hidden');
                     searchExtractedBtn.textContent = 'חפש רכב';
                     searchExtractedBtn.disabled = false;
                 } else {
@@ -541,22 +275,27 @@
             }
         }
 
-        // Search with extracted plate
         searchExtractedBtn.addEventListener('click', () => {
             if (extractedPlateNumber) {
                 searchVehicle(extractedPlateNumber);
             }
         });
 
-        // Clear upload
         clearUploadBtn.addEventListener('click', () => {
-            previewContainer.classList.remove('visible');
-            uploadArea.style.display = 'block';
-            extractedPlate.style.display = 'none';
+            previewContainer.classList.add('hidden');
+            uploadArea.classList.remove('hidden');
+            extractedPlate.classList.add('hidden');
             extractedPlateNumber = null;
             fileInput.value = '';
             searchExtractedBtn.disabled = true;
         });
+
+        // Search form
+        const searchForm = document.getElementById('searchForm');
+        const licensePlateInput = document.getElementById('licensePlate');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsContent = document.getElementById('resultsContent');
 
         searchForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -569,11 +308,11 @@
         async function searchVehicle(licensePlate) {
             searchBtn.disabled = true;
             searchExtractedBtn.disabled = true;
-            resultsCard.classList.add('visible');
+            resultsSection.classList.remove('hidden');
             resultsContent.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>מחפש נתונים...</p>
+                <div class="text-center py-12">
+                    <div class="inline-block h-10 w-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+                    <p class="text-text-muted-light">מחפש נתונים...</p>
                 </div>
             `;
 
@@ -591,21 +330,22 @@
 
                 if (records.length === 0) {
                     resultsContent.innerHTML = `
-                        <div class="no-results">
-                            <p>לא נמצאו תוצאות עבור מספר רישוי: ${licensePlate}</p>
+                        <div class="text-center py-12">
+                            <span class="material-symbols-outlined text-5xl text-text-muted-light mb-4">search_off</span>
+                            <p class="text-text-muted-light">לא נמצאו תוצאות עבור מספר רישוי: ${licensePlate}</p>
                         </div>
                     `;
                     return;
                 }
 
-                const vehicle = records[0];
-                displayResults(vehicle);
+                displayResults(records[0]);
 
             } catch (error) {
                 console.error('Error:', error);
                 resultsContent.innerHTML = `
-                    <div class="error">
-                        <p>אירעה שגיאה בחיפוש. אנא נסה שנית.</p>
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-5xl text-red-500 mb-4">error</span>
+                        <p class="text-red-500">אירעה שגיאה בחיפוש. אנא נסה שנית.</p>
                     </div>
                 `;
             } finally {
@@ -626,7 +366,6 @@
                     const label = fieldLabels[key] || key;
                     let displayValue = value;
 
-                    // Format dates
                     if (key.includes('_dt') && value) {
                         const date = new Date(value);
                         if (!isNaN(date)) {
@@ -634,26 +373,38 @@
                         }
                     }
 
-                    // Format boolean
                     if (key === 'automatic_ind') {
                         displayValue = value === 'A' ? 'כן' : 'לא';
                     }
 
                     infoItems += `
-                        <div class="info-item">
-                            <div class="info-label">${label}</div>
-                            <div class="info-value">${displayValue}</div>
+                        <div class="group flex flex-col overflow-hidden rounded-xl border border-surface-light bg-background-light shadow-sm transition-shadow hover:shadow-lg p-4">
+                            <p class="text-sm font-medium text-text-muted-light mb-1">${label}</p>
+                            <p class="text-lg font-bold text-text-light">${displayValue}</p>
                         </div>
                     `;
                 }
             }
 
             resultsContent.innerHTML = `
-                <div class="results-header">
-                    <span class="license-badge">${plateNumber}</span>
-                    <span>${vehicle.tozeret_nm || ''} ${vehicle.kinuy_mishari || ''}</span>
+                <div class="rounded-lg bg-surface-light p-6 mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex flex-col">
+                            <p class="text-[28px] font-bold leading-tight tracking-tight text-text-light">
+                                ${vehicle.tozeret_nm || ''} ${vehicle.kinuy_mishari || ''}
+                            </p>
+                            <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-muted-light">
+                                <span>${vehicle.shnat_yitzur || ''}</span>
+                                <span>•</span>
+                                <span>${vehicle.tzeva_rechev || ''}</span>
+                                <span>•</span>
+                                <span>${vehicle.sug_delek_nm || ''}</span>
+                            </div>
+                        </div>
+                        <span class="bg-primary text-text-light px-6 py-3 rounded-lg text-2xl font-extrabold tracking-widest" style="direction: ltr;">${plateNumber}</span>
+                    </div>
                 </div>
-                <div class="results-grid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     ${infoItems}
                 </div>
             `;
