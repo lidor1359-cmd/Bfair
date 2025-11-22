@@ -134,36 +134,46 @@ function extractFromLicenseDocument(text) {
     console.log('=== Extracting from license document ===');
     console.log('Full text preview:', text.substring(0, 500));
 
-    // In Israeli license documents, the plate number typically appears:
-    // 1. At the very beginning of the document (header area)
-    // 2. After "מספר רכב" label
+    // In Israeli license documents, look specifically for מספר רכב
+    // Avoid ID numbers which have format XXXXXXXX-X
 
-    // First try: Look for 8-digit number at the very start of the document
-    const startMatch = text.match(/^\s*(\d{8})/);
-    if (startMatch) {
-        console.log('Found at start of document:', startMatch[1]);
-        return startMatch[1];
+    // First: Find all 8-digit numbers that are NOT followed by a dash (to exclude ID numbers)
+    const allNumbers = [];
+    const numberRegex = /(\d{8})(?!-)/g;
+    let match;
+    while ((match = numberRegex.exec(text)) !== null) {
+        allNumbers.push({ num: match[1], index: match.index });
     }
 
-    // Second try: Find number before "מספר רכב" or near it
-    const beforeMispar = text.match(/(\d{8})\s*(?:1M|M1)?\s*.*?מספר\s*רכב/);
-    if (beforeMispar) {
-        console.log('Found before מספר רכב:', beforeMispar[1]);
-        return beforeMispar[1];
+    console.log('All 8-digit numbers (excluding IDs):', allNumbers.map(n => n.num));
+
+    // Look for number near "מספר רכב" keyword
+    const misparRechevIndex = text.indexOf('מספר רכב');
+    if (misparRechevIndex !== -1) {
+        console.log('Found מספר רכב at index:', misparRechevIndex);
+
+        // Find the closest number to "מספר רכב" (within 100 characters before or after)
+        let closestNum = null;
+        let closestDist = Infinity;
+
+        for (const numObj of allNumbers) {
+            const dist = Math.abs(numObj.index - misparRechevIndex);
+            if (dist < closestDist && dist < 100) {
+                closestDist = dist;
+                closestNum = numObj.num;
+            }
+        }
+
+        if (closestNum) {
+            console.log('Found number closest to מספר רכב:', closestNum);
+            return closestNum;
+        }
     }
 
-    // Third try: Find number after מספר רכב
-    const afterMispar = text.match(/מספר\s*רכב[:\s]*(\d{7,8})/);
-    if (afterMispar) {
-        console.log('Found after מספר רכב:', afterMispar[1]);
-        return afterMispar[1];
-    }
-
-    // Fourth try: First 8-digit number in the document (most likely the plate)
-    const firstEight = text.match(/(\d{8})/);
-    if (firstEight) {
-        console.log('Found first 8-digit number:', firstEight[1]);
-        return firstEight[1];
+    // Fallback: Return first 8-digit number that's not an ID
+    if (allNumbers.length > 0) {
+        console.log('Returning first non-ID number:', allNumbers[0].num);
+        return allNumbers[0].num;
     }
 
     // Look for the standard plate extraction
