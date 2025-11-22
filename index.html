@@ -429,6 +429,30 @@
         function displayResults(vehicle) {
             const plateNumber = vehicle.mispar_rechev || licensePlateInput.value;
 
+            // Check for warnings
+            const warnings = [];
+            if (vehicle.rechev_lo_pail) warnings.push('הרכב לא פעיל');
+            if (vehicle.rechev_butal) warnings.push('הרכב הורד מהכביש');
+            if (vehicle.tipul_baichor) warnings.push('טסט לא בתוקף');
+            if (vehicle.recalls && vehicle.recalls.length > 0) warnings.push('קיימות קריאות חוזר');
+
+            let warningBanner = '';
+            if (warnings.length > 0) {
+                warningBanner = `
+                    <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-4">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-red-500 text-2xl animate-pulse">warning</span>
+                            <div>
+                                <p class="text-red-400 font-bold mb-1">נמצאו בעיות ברכב!</p>
+                                <ul class="text-red-300 text-sm list-disc list-inside">
+                                    ${warnings.map(w => `<li>${w}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             const categories = {
                 'סטטוס הרכב': {
                     icon: 'verified_user',
@@ -557,6 +581,7 @@
             }
 
             resultsContent.innerHTML = `
+                ${warningBanner}
                 <div class="rounded-lg bg-white/10 p-4 mb-4">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-col">
