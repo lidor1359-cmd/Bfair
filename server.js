@@ -137,15 +137,15 @@ function extractFromLicenseDocument(text) {
     // In Israeli license documents, look specifically for מספר רכב
     // Avoid ID numbers which have format XXXXXXXX-X
 
-    // First: Find all 8-digit numbers that are NOT followed by a dash (to exclude ID numbers)
+    // First: Find all 7-8 digit numbers that are NOT followed by a dash (to exclude ID numbers)
     const allNumbers = [];
-    const numberRegex = /(\d{8})(?!-)/g;
+    const numberRegex = /(\d{7,8})(?!-|\d)/g;
     let match;
     while ((match = numberRegex.exec(text)) !== null) {
         allNumbers.push({ num: match[1], index: match.index });
     }
 
-    console.log('All 8-digit numbers (excluding IDs):', allNumbers.map(n => n.num));
+    console.log('All 7-8 digit numbers (excluding IDs):', allNumbers.map(n => n.num));
 
     // Look for number near "מספר רכב" keyword
     const misparRechevIndex = text.indexOf('מספר רכב');
