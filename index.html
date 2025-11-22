@@ -527,11 +527,15 @@
                                 </span>
                             </div>`;
                         } else if (key === 'mispar_yadayim' && vehicle.historiat_baalut && vehicle.historiat_baalut.length > 0) {
-                            // Display ownership count with detailed history
+                            // Filter out dealer records (סוחר) - they don't count as hands
+                            const realOwners = vehicle.historiat_baalut.filter(r => r.sug_baalut !== 'סוחר');
+                            const realCount = realOwners.length;
+
+                            // Display ownership count with detailed history (excluding dealers)
                             let historyHTML = `<div class="py-2 border-b border-white/5 last:border-0">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-sm text-gray-400">${label}</span>
-                                    <span class="font-medium text-sm text-white">${displayValue}</span>
+                                    <span class="font-medium text-sm text-white">${realCount}</span>
                                 </div>
                                 <div class="mt-2 bg-white/5 rounded-lg p-2">
                                     <table class="w-full text-sm">
@@ -544,12 +548,15 @@
                                         </thead>
                                         <tbody>`;
 
-                            for (const record of vehicle.historiat_baalut) {
+                            // Display only real owners (excluding dealers)
+                            let yadCounter = 1;
+                            for (const record of realOwners) {
                                 historyHTML += `<tr class="border-t border-white/5">
-                                    <td class="py-1 text-white">${record.yad}</td>
+                                    <td class="py-1 text-white">${yadCounter}</td>
                                     <td class="py-1 text-[#BF953F]">${record.sug_baalut || '-'}</td>
                                     <td class="py-1 text-gray-300">${record.taarich || '-'}</td>
                                 </tr>`;
+                                yadCounter++;
                             }
 
                             historyHTML += `</tbody></table></div></div>`;
