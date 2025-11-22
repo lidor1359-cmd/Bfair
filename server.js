@@ -132,15 +132,38 @@ function extractLicensePlate(text) {
 // Extract license plate from vehicle registration document
 function extractFromLicenseDocument(text) {
     console.log('=== Extracting from license document ===');
+    console.log('Full text preview:', text.substring(0, 500));
 
-    // In Israeli license documents, the plate number appears after "מספר רכב" or similar
-    // Also look for patterns near keywords like רישיון, רכב, מספר
+    // In Israeli license documents, the plate number typically appears:
+    // 1. At the very beginning of the document (header area)
+    // 2. After "מספר רכב" label
 
-    // First try to find number after מספר רכב:
+    // First try: Look for 8-digit number at the very start of the document
+    const startMatch = text.match(/^\s*(\d{8})/);
+    if (startMatch) {
+        console.log('Found at start of document:', startMatch[1]);
+        return startMatch[1];
+    }
+
+    // Second try: Find number before "מספר רכב" or near it
+    const beforeMispar = text.match(/(\d{8})\s*(?:1M|M1)?\s*.*?מספר\s*רכב/);
+    if (beforeMispar) {
+        console.log('Found before מספר רכב:', beforeMispar[1]);
+        return beforeMispar[1];
+    }
+
+    // Third try: Find number after מספר רכב
     const afterMispar = text.match(/מספר\s*רכב[:\s]*(\d{7,8})/);
     if (afterMispar) {
         console.log('Found after מספר רכב:', afterMispar[1]);
         return afterMispar[1];
+    }
+
+    // Fourth try: First 8-digit number in the document (most likely the plate)
+    const firstEight = text.match(/(\d{8})/);
+    if (firstEight) {
+        console.log('Found first 8-digit number:', firstEight[1]);
+        return firstEight[1];
     }
 
     // Look for the standard plate extraction
