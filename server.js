@@ -87,13 +87,7 @@ async function extractTextFromImage(imageBuffer) {
 function extractLicensePlate(text) {
     console.log('=== Extracting plate from text ===');
 
-    // Find all 8-digit numbers (new format plates)
-    const all8digit = [...text.matchAll(/(\d{8})/g)].map(m => ({ num: m[1], index: m.index }));
-
-    // Find all 7-digit numbers (old format plates)
-    const all7digit = [...text.matchAll(/(\d{7})/g)].map(m => ({ num: m[1], index: m.index }));
-
-    // Find formatted plates XXX-XX-XXX or XX-XXX-XX
+    // Find formatted plates XXX-XX-XXX or XX-XXX-XX (highest priority - most reliable)
     const formatted = [];
     const fmtMatches = [...text.matchAll(/(\d{2,3})[-–:.\s]+(\d{2,3})[-–:.\s]+(\d{2,3})/g)];
     for (const m of fmtMatches) {
@@ -104,14 +98,34 @@ function extractLicensePlate(text) {
     }
 
     console.log('Formatted plates:', formatted);
-    console.log('8-digit numbers:', all8digit);
-    console.log('7-digit numbers:', all7digit);
 
-    // Priority: formatted plates > 8-digit > 7-digit
+    // If we found formatted plates, use them (most reliable)
     if (formatted.length > 0) {
         formatted.sort((a, b) => a.index - b.index);
         console.log('Returning formatted:', formatted[0].num);
         return formatted[0].num;
+    }
+
+    // Find all 8-digit numbers (new format plates)
+    const all8digit = [...text.matchAll(/(\d{8})/g)].map(m => ({ num: m[1], index: m.index }));
+
+    // Find all 7-digit numbers (old format plates)
+    const all7digit = [...text.matchAll(/(\d{7})/g)].map(m => ({ num: m[1], index: m.index }));
+
+    console.log('8-digit numbers:', all8digit);
+    console.log('7-digit numbers:', all7digit);
+
+    // Check if 8-digit numbers might be false positives (IL/1 prefix issue)
+    // If an 8-digit number starts with "1" and we have a 7-digit match, prefer the 7-digit
+    if (all8digit.length > 0 && all7digit.length > 0) {
+        const first8 = all8digit[0].num;
+        const first7 = all7digit[0].num;
+
+        // If 8-digit starts with "1" and contains the 7-digit number, use the 7-digit
+        if (first8.startsWith('1') && first8.includes(first7)) {
+            console.log('Detected IL prefix issue, returning 7-digit:', first7);
+            return first7;
+        }
     }
 
     if (all8digit.length > 0) {
