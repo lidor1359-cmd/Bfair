@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bfair - שאלון התאמה לרכב</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Heebo', sans-serif; }
+        .gold-gradient { background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C); }
+        .gold-text { background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .option-card { transition: all 0.2s ease; }
+        .option-card:hover { transform: translateY(-2px); }
+        .option-card.selected { border-color: #BF953F; background: rgba(191, 149, 63, 0.1); }
+        .progress-bar { transition: width 0.3s ease; }
+    </style>
+</head>
+<body class="bg-black min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-b border-white/10 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="logo.jpeg" alt="Bfair" class="h-8 rounded">
+            </a>
+            <div class="flex gap-4 text-sm">
+                <a href="index.html" class="text-gray-400 hover:text-white transition">בדיקת רכב</a>
+                <a href="questionnaire.html" class="text-[#BF953F]">שאלון התאמה</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-10 px-4">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold mb-2">שאלון התאמה לקניית רכב</h1>
+                <p class="text-gray-400 text-sm">ענה על השאלות ונמצא לך את הרכב המושלם</p>
+            </div>
+
+            <!-- Progress -->
+            <div class="mb-8">
+                <div class="flex justify-between text-xs text-gray-400 mb-2">
+                    <span>שאלה <span id="currentQ">1</span> מתוך 10</span>
+                    <span id="progressPercent">10%</span>
+                </div>
+                <div class="h-1 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full gold-gradient" style="width: 10%"></div>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questionsContainer">
+                <!-- Question 1 -->
+                <div class="question-slide" data-question="1">
+                    <h2 class="text-lg font-semibold mb-4">כמה קילומטרים אתה נוסע בשנה?</h2>
+                    <p class="text-gray-400 text-sm mb-4">אם אינך בטוח, הערכה גסה</p>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="0-10000">עד 10,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="10000-15000">10,000–15,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="15000-20000">15,000–20,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="20000-30000">20,000–30,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="30000+">מעל 30,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="unknown">אינני יודע/ת</button>
+                    </div>
+                </div>
+
+                <!-- Question 1b -->
+                <div class="question-slide hidden" data-question="1b">
+                    <h2 class="text-lg font-semibold mb-4">בחר תדירות נסיעה משוערת:</h2>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="short">יומיום קצר (עד 15 דקות)</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="medium">יומיום בינוני (20–40 דקות)</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="long">יומיום ארוך (40+ דקות)</button>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-slide hidden" data-question="2">
+                    <h2 class="text-lg font-semibold mb-4">מה סוג הנסיעות העיקרי שלך?</h2>
+                    <p class="text-gray-400 text-sm mb-4">בחר את האפשרות הקרובה ביותר</p>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="city-short">נסיעות קצרות בעיר (פחות מ-15 דקות)</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="city-medium">נסיעות בינוניות בעיר ובין עירונית (20–40 דקות)</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="highway">נסיעות ארוכות וכבישים מהירים (40 דקות ומעלה)</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="offroad">לפעמים נוסע בדרכי עפר (שטח)</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="unknown">אינני יודע/ת</button>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question-slide hidden" data-question="3">
+                    <h2 class="text-lg font-semibold mb-4">כמה מושבים?</h2>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2">2</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="4">4</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="5">5</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="7+">7 ומעלה</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="unknown">אינני יודע/ת</button>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question-slide hidden" data-question="4">
+                    <h2 class="text-lg font-semibold mb-4">איזה נפח תא מטען תעדיף?</h2>
+                    <p class="text-gray-400 text-sm mb-4">נפח התא מטען מתאים לגודל המטען שתצטרך להסיע</p>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="280">עד 280 ליטר</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="300-420">300–420 ליטר</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="420-550">420–550 ליטר</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="550+">מעל 550 ליטר</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="any">לא משנה לי</button>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="question-slide hidden" data-question="5">
+                    <h2 class="text-lg font-semibold mb-4">מהם המאפיינים החשובים ביותר לך?</h2>
+                    <p class="text-gray-400 text-sm mb-4">בחר עד 3</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="fuel">חסכון בדלק</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="reliable">אמינות גבוהה</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="comfort">נוחות בנסיעה</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="suv">רכב גבוה</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="trunk">תא מטען גדול</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="power">ביצועי מנוע חזקים</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="safety">רמת בטיחות</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="maintenance">עלויות אחזקה נמוכות</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="media">מערכת מולטימדיה</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="space">תא נוסעים מרווח</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="highway">יציבות בכבישים מהירים</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="hybrid">היברידי / חשמלי</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="parking">קל לתמרון ולחניה</button>
+                        <button class="option-card multi p-3 bg-gray-900 border border-gray-700 rounded-lg text-sm text-right hover:border-[#BF953F]" data-value="budget">מחיר לפי תקציב</button>
+                    </div>
+                    <button id="q5Continue" class="mt-4 w-full p-3 gold-gradient text-black font-semibold rounded-lg opacity-50 cursor-not-allowed" disabled>המשך</button>
+                </div>
+
+                <!-- Question 6 -->
+                <div class="question-slide hidden" data-question="6">
+                    <h2 class="text-lg font-semibold mb-4">מה התקציב שלך לרכב?</h2>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="exact" data-input="true">סכום מדויק</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="range" data-input="true">טווח תקציב</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="flexible">אין סכום מדויק</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="unknown">אינני יודע/ת</button>
+                    </div>
+                    <div id="budgetInput" class="hidden mt-4">
+                        <input type="text" id="budgetValue" placeholder="הכנס סכום בש״ח" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white">
+                        <button id="budgetContinue" class="mt-2 w-full p-3 gold-gradient text-black font-semibold rounded-lg">המשך</button>
+                    </div>
+                </div>
+
+                <!-- Question 7 -->
+                <div class="question-slide hidden" data-question="7">
+                    <h2 class="text-lg font-semibold mb-4">מה הקילומטראז׳ המקסימלי שאתה מוכן לקבל ברכב יד שניה?</h2>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="80000">עד 80,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="120000">עד 120,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="160000">עד 160,000 ק״מ</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="any">לא משנה לי</button>
+                    </div>
+                </div>
+
+                <!-- Question 8 -->
+                <div class="question-slide hidden" data-question="8">
+                    <h2 class="text-lg font-semibold mb-4">מהו שנתון הרכב המינימלי שאתה מוכן לשקול?</h2>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2010">החל מ־2010</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2013">החל מ־2013</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2015">החל מ־2015</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2017">החל מ־2017</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2019">החל מ־2019</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="2021">החל מ־2021</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="any">אין דרישה</button>
+                    </div>
+                </div>
+
+                <!-- Question 9 -->
+                <div class="question-slide hidden" data-question="9">
+                    <h2 class="text-lg font-semibold mb-4">האם יש יצרני רכב שאתה מעדיף או מעוניין להימנע מהם?</h2>
+                    <div class="space-y-3">
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="prefer" data-brands="true">אני מעדיף יצרנים מסוימים</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="avoid" data-brands="true">אני מעדיף להימנע מיצרנים</button>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="none">אין לי העדפות</button>
+                    </div>
+                    <div id="brandsSelector" class="hidden mt-4">
+                        <p class="text-sm text-gray-400 mb-2">בחר יצרנים:</p>
+                        <div class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">טויוטה</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">מאזדה</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">הונדה</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">יונדאי</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">קיה</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">ניסאן</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">סובארו</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">פולקסווגן</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">סקודה</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">מרצדס</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">ב.מ.וו</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">אאודי</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">וולוו</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">פורד</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">שברולט</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">ג'יפ</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">רנו</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">פיג'ו</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">סיטרואן</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">טסלה</button>
+                            <button class="brand-btn p-2 bg-gray-900 border border-gray-700 rounded text-xs hover:border-[#BF953F]">BYD</button>
+                        </div>
+                        <button id="brandsContinue" class="mt-3 w-full p-3 gold-gradient text-black font-semibold rounded-lg">המשך</button>
+                    </div>
+                </div>
+
+                <!-- Question 10 -->
+                <div class="question-slide hidden" data-question="10">
+                    <h2 class="text-lg font-semibold mb-4">האם יש דגם מסוים שתרצה לבדוק?</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="yes" data-model="true">כן</button>
+                            <div id="modelInput" class="hidden mt-2">
+                                <input type="text" id="modelValue" placeholder="כתוב את הדגם" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white">
+                            </div>
+                        </div>
+                        <button class="option-card w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-right hover:border-[#BF953F]" data-value="no">אין לי העדפה</button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="question-slide hidden" data-question="results">
+                    <div class="text-center py-8">
+                        <div class="text-4xl mb-4">&#10003;</div>
+                        <h2 class="text-xl font-bold mb-2 gold-text">השאלון הושלם!</h2>
+                        <p class="text-gray-400 mb-6">תודה על מילוי השאלון. נחזור אליך עם המלצות מותאמות אישית.</p>
+                        <button onclick="window.location.href='index.html'" class="px-6 py-3 gold-gradient text-black font-semibold rounded-lg">חזרה לעמוד הראשי</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div id="navButtons" class="flex gap-3 mt-6">
+                <button id="prevBtn" class="hidden flex-1 p-3 bg-gray-800 text-white rounded-lg">הקודם</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const answers = {};
+        let currentQuestion = '1';
+        const questionOrder = ['1', '1b', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'results'];
+        let selectedFeatures = [];
+        let selectedBrands = [];
+
+        function showQuestion(qNum) {
+            document.querySelectorAll('.question-slide').forEach(q => q.classList.add('hidden'));
+            document.querySelector(`[data-question="${qNum}"]`).classList.remove('hidden');
+            currentQuestion = qNum;
+
+            // Update progress
+            const idx = questionOrder.indexOf(qNum);
+            const percent = Math.round(((idx + 1) / questionOrder.length) * 100);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('currentQ').textContent = Math.min(idx + 1, 10);
+
+            // Show/hide prev button
+            document.getElementById('prevBtn').classList.toggle('hidden', idx === 0);
+            document.getElementById('navButtons').classList.toggle('hidden', qNum === 'results');
+        }
+
+        function nextQuestion() {
+            const idx = questionOrder.indexOf(currentQuestion);
+            if (idx < questionOrder.length - 1) {
+                showQuestion(questionOrder[idx + 1]);
+            }
+        }
+
+        function prevQuestion() {
+            const idx = questionOrder.indexOf(currentQuestion);
+            if (idx > 0) {
+                showQuestion(questionOrder[idx - 1]);
+            }
+        }
+
+        // Single choice questions
+        document.querySelectorAll('.option-card:not(.multi)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const question = this.closest('.question-slide').dataset.question;
+
+                // Handle special cases
+                if (this.dataset.input === 'true') {
+                    document.getElementById('budgetInput').classList.remove('hidden');
+                    this.closest('.question-slide').querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    answers[question] = { type: this.dataset.value, value: null };
+                    return;
+                }
+
+                if (this.dataset.brands === 'true') {
+                    if (this.dataset.value !== 'none') {
+                        document.getElementById('brandsSelector').classList.remove('hidden');
+                    } else {
+                        document.getElementById('brandsSelector').classList.add('hidden');
+                    }
+                    this.closest('.question-slide').querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    answers[question] = { type: this.dataset.value, brands: [] };
+                    if (this.dataset.value === 'none') nextQuestion();
+                    return;
+                }
+
+                if (this.dataset.model === 'true') {
+                    document.getElementById('modelInput').classList.remove('hidden');
+                    this.classList.add('selected');
+                    return;
+                }
+
+                // Regular selection
+                this.closest('.question-slide').querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                answers[question] = this.dataset.value;
+
+                setTimeout(nextQuestion, 200);
+            });
+        });
+
+        // Multi-select for question 5
+        document.querySelectorAll('.option-card.multi').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const value = this.dataset.value;
+                const idx = selectedFeatures.indexOf(value);
+
+                if (idx > -1) {
+                    selectedFeatures.splice(idx, 1);
+                    this.classList.remove('selected');
+                } else if (selectedFeatures.length < 3) {
+                    selectedFeatures.push(value);
+                    this.classList.add('selected');
+                }
+
+                const continueBtn = document.getElementById('q5Continue');
+                if (selectedFeatures.length > 0) {
+                    continueBtn.disabled = false;
+                    continueBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    continueBtn.disabled = true;
+                    continueBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        });
+
+        document.getElementById('q5Continue').addEventListener('click', function() {
+            answers['5'] = selectedFeatures;
+            nextQuestion();
+        });
+
+        // Brand selection
+        document.querySelectorAll('.brand-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                this.classList.toggle('border-[#BF953F]');
+                this.classList.toggle('bg-[#BF953F]/20');
+            });
+        });
+
+        document.getElementById('brandsContinue').addEventListener('click', function() {
+            selectedBrands = Array.from(document.querySelectorAll('.brand-btn.selected')).map(b => b.textContent);
+            answers['9'].brands = selectedBrands;
+            nextQuestion();
+        });
+
+        // Budget continue
+        document.getElementById('budgetContinue').addEventListener('click', function() {
+            answers['6'].value = document.getElementById('budgetValue').value;
+            nextQuestion();
+        });
+
+        // Model input - auto continue when typing stops
+        document.getElementById('modelValue').addEventListener('input', function() {
+            answers['10'] = { hasModel: true, model: this.value };
+        });
+
+        document.querySelector('[data-question="10"] [data-value="no"]').addEventListener('click', function() {
+            answers['10'] = { hasModel: false };
+            setTimeout(nextQuestion, 200);
+        });
+
+        // Prev button
+        document.getElementById('prevBtn').addEventListener('click', prevQuestion);
+
+        // Initialize
+        showQuestion('1');
+    </script>
+</body>
+</html>
