@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
+const pdfParse = require('pdf-parse');
 require('dotenv').config();
 
 const app = express();
@@ -12,11 +13,11 @@ const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
         if (allowedTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Invalid file type. Only JPEG, PNG, and WebP are allowed.'));
+            cb(new Error('Invalid file type. Only JPEG, PNG, WebP, and PDF are allowed.'));
         }
     }
 });
@@ -150,18 +151,31 @@ function extractFromLicenseDocument(text) {
 app.post('/api/extract-plate', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ success: false, error: 'No image provided' });
+            return res.status(400).json({ success: false, error: 'No file provided' });
         }
 
         const uploadType = req.body.type || 'vehicle';
-        console.log('Upload type:', uploadType);
+        const isPDF = req.file.mimetype === 'application/pdf';
+        console.log('Upload type:', uploadType, 'isPDF:', isPDF);
 
-        const fullText = await extractTextFromImage(req.file.buffer);
+        let fullText;
+
+        if (isPDF) {
+            // Extract text directly from PDF
+            const pdfData = await pdfParse(req.file.buffer);
+            fullText = pdfData.text;
+            console.log('=== PDF TEXT ===');
+            console.log(fullText);
+            console.log('=== END PDF ===');
+        } else {
+            // Use Google Vision API for images
+            fullText = await extractTextFromImage(req.file.buffer);
+        }
 
         if (!fullText) {
             return res.status(404).json({
                 success: false,
-                error: uploadType === 'license' ? 'לא זוהה טקסט ברישיון' : 'No text detected in image'
+                error: uploadType === 'license' ? 'לא זוהה טקסט ברישיון' : 'No text detected in file'
             });
         }
 
@@ -175,7 +189,7 @@ app.post('/api/extract-plate', upload.single('image'), async (req, res) => {
                 success: false,
                 error: uploadType === 'license'
                     ? 'לא זוהה מספר רישוי ברישיון הרכב'
-                    : 'No valid license plate found in image',
+                    : 'No valid license plate found in file',
                 detectedText: fullText
             });
         }
@@ -187,10 +201,10 @@ app.post('/api/extract-plate', upload.single('image'), async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Vision API Error:', error);
+        console.error('Processing Error:', error);
         res.status(500).json({
             success: false,
-            error: 'Failed to process image'
+            error: 'Failed to process file'
         });
     }
 });
