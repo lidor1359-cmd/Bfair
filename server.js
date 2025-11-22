@@ -117,8 +117,16 @@ function extractLicensePlate(text) {
     if (formatted.length > 0) {
         // Sort by position - take the first one
         formatted.sort((a, b) => a.index - b.index);
-        console.log('Returning formatted plate:', formatted[0].num);
-        return formatted[0].num;
+        let plate = formatted[0].num;
+
+        // Check if this is 8-digit starting with 1 (IL prefix issue)
+        if (plate.length === 8 && plate.startsWith('1')) {
+            plate = plate.substring(1);
+            console.log('Formatted plate had IL prefix, returning:', plate);
+        } else {
+            console.log('Returning formatted plate:', plate);
+        }
+        return plate;
     }
 
     // Step 3: Look for continuous digit sequences
