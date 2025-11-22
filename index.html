@@ -1,166 +1,225 @@
 <!DOCTYPE html>
-<html class="light" dir="rtl" lang="he">
+<html dir="rtl" lang="he">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bfair - בדיקת רכב</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f1c822",
-                        "background-light": "#f8f8f6",
-                        "background-dark": "#181711",
-                        "surface-light": "#ffffff",
-                        "surface-dark": "#221e10",
-                        "text-light": "#181711",
-                        "text-dark": "#f5f4f0",
-                        "text-muted-light": "#8a8260",
-                        "text-muted-dark": "#8a8260",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
-                },
-            },
-        }
-    </script>
     <style>
-        body { font-family: 'Manrope', sans-serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+        }
+
+        .text-gold-gradient {
+            background: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-premium {
+            background: linear-gradient(90deg, #d4af37 0%, #C5A028 100%);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-premium:hover {
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .bg-concrete {
+            background-color: #111111;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23222222' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            transition: 0.3s;
+        }
+        .glass-input:focus {
+            border-color: #BF953F;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
-    <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div class="layout-container flex h-full grow flex-col">
-            <!-- Header -->
-            <header class="sticky top-0 z-50 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm">
-                <div class="container mx-auto px-4">
-                    <div class="flex items-center justify-center whitespace-nowrap border-b border-solid border-primary/20 h-32">
-                        <div class="flex items-center gap-4">
-                            <img src="logo.jpeg" alt="Bfair" class="h-28">
+<body>
+
+    <!-- Header -->
+    <nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center items-center h-24">
+                <img src="logo.jpeg" alt="Bfair Logo" class="h-16 w-auto object-contain filter brightness-110 contrast-125">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative bg-concrete min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+
+        <!-- Background effects -->
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-[#BF953F] rounded-full mix-blend-overlay filter blur-[128px] opacity-20 animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-900 rounded-full mix-blend-overlay filter blur-[128px] opacity-20"></div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
+
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
+                בדיקת <span class="text-gold-gradient">פרטי רכב</span>
+            </h1>
+
+            <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-400 mb-8 font-light">
+                הזן מספר רישוי או העלה תמונה לקבלת מידע מלא על הרכב
+            </p>
+
+            <!-- Search Card -->
+            <div class="bg-white/5 backdrop-blur-lg border border-white/10 p-6 rounded-xl max-w-3xl mx-auto shadow-2xl">
+
+                <!-- Tabs -->
+                <div class="flex gap-4 justify-center mb-6">
+                    <button id="tab-manual" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all bg-[#BF953F] text-black" onclick="switchTab('manual')">
+                        הזנה ידנית
+                    </button>
+                    <button id="tab-upload" class="tab-btn px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all bg-white/10 text-gray-300 hover:bg-white/20" onclick="switchTab('upload')">
+                        העלאת תמונה
+                    </button>
+                </div>
+
+                <!-- Manual Input -->
+                <div id="manual-content" class="tab-content">
+                    <form id="searchForm" class="flex gap-3">
+                        <input
+                            type="text"
+                            id="licensePlate"
+                            class="glass-input flex-1 p-4 rounded-lg text-center text-lg tracking-widest placeholder:text-gray-500"
+                            placeholder="הזן מספר רישוי"
+                            maxlength="8"
+                            style="direction: ltr;"
+                            required
+                        />
+                        <button type="submit" id="searchBtn" class="btn-premium text-black font-black py-4 px-8 rounded-lg uppercase tracking-wide">
+                            חיפוש
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Image Upload -->
+                <div id="upload-content" class="tab-content hidden">
+                    <!-- Upload Type Selection -->
+                    <div id="uploadTypeSelection" class="grid grid-cols-2 gap-4 mb-4">
+                        <div id="uploadVehicle" class="border-2 border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer hover:border-[#BF953F] hover:bg-[#BF953F]/10 transition-all">
+                            <span class="material-symbols-outlined text-4xl text-[#BF953F] mb-2">directions_car</span>
+                            <p class="text-white font-medium text-sm mb-1">צילום הרכב</p>
+                            <p class="text-gray-500 text-xs">כולל לוחית רישוי</p>
+                        </div>
+                        <div id="uploadLicense" class="border-2 border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer hover:border-[#BF953F] hover:bg-[#BF953F]/10 transition-all">
+                            <span class="material-symbols-outlined text-4xl text-[#BF953F] mb-2">description</span>
+                            <p class="text-white font-medium text-sm mb-1">צילום רישיון רכב</p>
+                            <p class="text-gray-500 text-xs">מסמך הרישיון</p>
+                        </div>
+                    </div>
+
+                    <input type="file" id="fileInputVehicle" class="hidden" accept="image/jpeg,image/png,image/webp">
+                    <input type="file" id="fileInputLicense" class="hidden" accept="image/jpeg,image/png,image/webp">
+
+                    <div id="previewContainer" class="hidden mt-4">
+                        <img id="previewImage" class="w-full max-h-48 object-contain rounded-lg mb-4" alt="Preview">
+                        <div id="extractedPlate" class="hidden bg-white/10 rounded-lg p-4 mb-4">
+                            <p class="text-gray-400 text-sm mb-1">מספר רישוי שזוהה:</p>
+                            <p id="extractedPlateValue" class="text-2xl font-bold text-[#BF953F] tracking-widest" style="direction: ltr;"></p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="searchExtractedBtn" disabled class="flex-1 btn-premium text-black font-bold py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                חפש רכב
+                            </button>
+                            <button id="clearUploadBtn" class="py-3 px-4 rounded-lg bg-white/10 text-gray-300 font-medium hover:bg-white/20 transition-colors">
+                                נקה
+                            </button>
                         </div>
                     </div>
                 </div>
-            </header>
-
-            <main class="flex-grow">
-                <!-- Hero Section with Search -->
-                <div class="@container relative">
-                    <div class="flex min-h-[600px] flex-col gap-8 items-center justify-center p-4 text-center" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%, #1a1a1a 100%); position: relative; overflow: hidden;">
-                        <!-- Decorative gold accent -->
-                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, transparent, #d4af37, #ffd700, #d4af37, transparent);"></div>
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, transparent, #d4af37, #ffd700, #d4af37, transparent);"></div>
-
-                        <div class="flex flex-col gap-4 max-w-3xl">
-                            <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em] md:text-6xl">בדיקת פרטי רכב</h1>
-                            <h2 class="text-white/90 text-lg font-normal leading-normal md:text-xl">הזן מספר רישוי או העלה תמונה לקבלת מידע מלא על הרכב</h2>
-                        </div>
-
-                        <!-- Search Card -->
-                        <div class="w-full max-w-3xl bg-surface-light/20 dark:bg-surface-dark/20 backdrop-blur-md p-4 rounded-xl shadow-lg">
-                            <!-- Tabs -->
-                            <div class="flex-wrap gap-4 flex justify-center mb-4">
-                                <button id="tab-manual" class="tab-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary/30 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/50 transition-colors" onclick="switchTab('manual')">
-                                    <span class="truncate">הזנה ידנית</span>
-                                </button>
-                                <button id="tab-upload" class="tab-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-background-light/30 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-background-light/50 transition-colors" onclick="switchTab('upload')">
-                                    <span class="truncate">העלאת תמונה</span>
-                                </button>
-                            </div>
-
-                            <!-- Manual Input -->
-                            <div id="manual-content" class="tab-content">
-                                <form id="searchForm">
-                                    <label class="flex flex-col h-14 w-full">
-                                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-                                            <div class="text-text-light flex bg-surface-light dark:bg-surface-dark items-center justify-center pr-4 rounded-r-lg">
-                                                <span class="material-symbols-outlined">search</span>
-                                            </div>
-                                            <input
-                                                type="text"
-                                                id="licensePlate"
-                                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary border-none bg-surface-light dark:bg-surface-dark h-full placeholder:text-text-muted-light dark:placeholder:text-text-muted-dark px-4 text-base font-normal leading-normal text-center tracking-widest"
-                                                placeholder="הזן מספר רישוי"
-                                                maxlength="8"
-                                                style="direction: ltr;"
-                                                required
-                                            />
-                                            <button type="submit" id="searchBtn" class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-l-lg h-full px-5 bg-primary text-text-light text-base font-bold hover:bg-opacity-90 transition-opacity">
-                                                <span class="truncate">חיפוש</span>
-                                            </button>
-                                        </div>
-                                    </label>
-                                </form>
-                            </div>
-
-                            <!-- Image Upload -->
-                            <div id="upload-content" class="tab-content hidden">
-                                <div id="uploadArea" class="border-2 border-dashed border-white/30 rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-all">
-                                    <span class="material-symbols-outlined text-5xl text-primary mb-3">photo_camera</span>
-                                    <p class="text-white font-medium mb-1">לחץ להעלאת תמונה או גרור לכאן</p>
-                                    <p class="text-white/70 text-sm">JPEG, PNG או WebP עד 10MB</p>
-                                    <input type="file" id="fileInput" class="hidden" accept="image/jpeg,image/png,image/webp">
-                                </div>
-
-                                <div id="previewContainer" class="hidden mt-4">
-                                    <img id="previewImage" class="w-full max-h-48 object-contain rounded-lg mb-4" alt="Preview">
-                                    <div id="extractedPlate" class="hidden bg-surface-light/90 rounded-lg p-4 mb-4">
-                                        <p class="text-text-muted-light text-sm mb-1">מספר רישוי שזוהה:</p>
-                                        <p id="extractedPlateValue" class="text-2xl font-bold text-primary tracking-widest" style="direction: ltr;"></p>
-                                    </div>
-                                    <div class="flex gap-3">
-                                        <button id="searchExtractedBtn" disabled class="flex-1 h-12 rounded-lg bg-primary text-text-light font-bold hover:bg-opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
-                                            חפש רכב
-                                        </button>
-                                        <button id="clearUploadBtn" class="h-12 px-4 rounded-lg bg-surface-light text-text-muted-light font-medium hover:bg-gray-200 transition-colors">
-                                            נקה
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Trust badges -->
+                <div class="mt-4 text-gray-500 text-sm flex justify-center gap-6">
+                    <span class="flex items-center gap-1"><span class="text-[#BF953F]">✓</span> 100% שקיפות</span>
+                    <span class="flex items-center gap-1"><span class="text-[#BF953F]">✓</span> בדיקה מקיפה</span>
+                    <span class="flex items-center gap-1"><span class="text-[#BF953F]">✓</span> אחריות Bfair</span>
                 </div>
+            </div>
+        </div>
 
-                <!-- Results Section -->
-                <section id="resultsSection" class="hidden py-16 sm:py-24">
-                    <div class="container mx-auto px-4 max-w-4xl">
-                        <div id="resultsContent" class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg p-6">
-                            <!-- Results will be injected here -->
-                        </div>
-                    </div>
-                </section>
-            </main>
+        <!-- Wave SVG -->
+        <svg class="absolute bottom-0 left-0 w-full h-auto opacity-10 pointer-events-none" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#BF953F" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+    </div>
 
-            <!-- Footer -->
-            <footer class="bg-surface-dark text-background-light">
-                <div class="container mx-auto px-4 py-16">
-                    <div class="flex flex-col items-center">
-                        <img src="logo.jpeg" alt="Bfair" class="h-24 mb-4">
-                        <p class="text-text-muted-dark text-center max-w-md">בדיקת פרטי רכב מהירה ומדויקת. הזן מספר רישוי או העלה תמונה לקבלת מידע מלא.</p>
-                    </div>
-                    <div class="mt-8 border-t border-primary/20 pt-8 text-center text-text-muted-dark">
-                        <p>© 2024 Bfair. כל הזכויות שמורות.</p>
-                    </div>
+    <!-- Features Section -->
+    <div class="bg-black py-20 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div>
+                <div class="w-16 h-16 bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] rounded-2xl rotate-45 mx-auto mb-6 flex items-center justify-center shadow-[0_0_30px_rgba(191,149,63,0.3)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-black -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
                 </div>
-            </footer>
+                <h3 class="text-2xl font-bold text-white mb-2">סטנדרט אמינות חדש</h3>
+                <p class="text-gray-500">כל רכב עובר תהליך אימות קפדני. אין הפתעות, רק שקט נפשי.</p>
+            </div>
+            <div>
+                <div class="w-16 h-16 bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] rounded-2xl rotate-45 mx-auto mb-6 flex items-center justify-center shadow-[0_0_30px_rgba(191,149,63,0.3)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-black -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">חוויה ספורטיבית ומהירה</h3>
+                <p class="text-gray-500">ממשק משתמש מהיר, חיפוש מתקדם, וסגירת עסקה ללא בירוקרטיה מיותרת.</p>
+            </div>
+            <div>
+                <div class="w-16 h-16 bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] rounded-2xl rotate-45 mx-auto mb-6 flex items-center justify-center shadow-[0_0_30px_rgba(191,149,63,0.3)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-black -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Fair Value</h3>
+                <p class="text-gray-500">תמחור הוגן ושקוף המבוסס על נתוני אמת של השוק.</p>
+            </div>
         </div>
     </div>
 
-    <script>
-        const API_BASE = 'https://data.gov.il/api/3/action/datastore_search';
-        const RESOURCE_ID = '053cea08-09bc-40ec-8f7a-156f0677aff3';
-        const VISION_API = '/api/extract-plate';
+    <!-- Results Section -->
+    <section id="resultsSection" class="hidden py-16 bg-black">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div id="resultsContent" class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6">
+                <!-- Results will be injected here -->
+            </div>
+        </div>
+    </section>
 
+    <!-- Footer -->
+    <footer class="bg-black border-t border-white/10">
+        <div class="container mx-auto px-4 py-12">
+            <div class="flex flex-col items-center">
+                <img src="logo.jpeg" alt="Bfair" class="h-16 mb-4">
+                <p class="text-gray-500 text-center max-w-md text-sm">בדיקת פרטי רכב מהירה ומדויקת. הזן מספר רישוי או העלה תמונה לקבלת מידע מלא.</p>
+            </div>
+            <div class="mt-6 border-t border-white/10 pt-6 text-center text-gray-600 text-sm">
+                <p>&copy; 2024 Bfair. כל הזכויות שמורות.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const VISION_API = '/api/extract-plate';
         let extractedPlateNumber = null;
 
         const fieldLabels = {
@@ -175,19 +234,9 @@
             'baalut': 'בעלות',
             'misgeret': 'מספר שלדה',
             'tokef_dt': 'תוקף רישיון',
-            'mivchan_acharon_dt': 'מבחן אחרון',
-            'kvutzat_zihum': 'קבוצת זיהום',
-            'degem_manoa': 'דגם מנוע',
-            'horaat_rishum': 'הוראת רישום',
             'moed_aliya_lakvish': 'מועד עליה לכביש',
             'zmig_kidmi': 'צמיג קדמי',
             'zmig_ahori': 'צמיג אחורי',
-            'tozeret_cd': 'קוד יצרן',
-            'degem_cd': 'קוד דגם',
-            'tzeva_cd': 'קוד צבע',
-            'sug_degem': 'סוג דגם',
-            'ramat_eivzur_betihuty': 'רמת אבזור בטיחותי',
-            // WLTP specs
             'koah_sus': 'כוח סוס',
             'nefah_manoa': 'נפח מנוע (סמ"ק)',
             'mishkal_kolel': 'משקל כולל (ק"ג)',
@@ -196,15 +245,13 @@
             'automatic_ind': 'אוטומטי',
             'merkav': 'סוג מרכב',
             'madad_yarok': 'מדד ירוק',
-            // Structural changes
+            'kvutzat_zihum': 'קבוצת זיהום',
             'kilometer': 'קילומטראז אחרון',
             'shinui_mivne': 'שינוי מבנה',
             'shinui_tzeva': 'שינוי צבע',
             'rishum_rishon': 'רישום ראשון',
-            // Ownership
             'mispar_yadayim': 'מספר ידיים',
             'shinui_baalut_acharon': 'שינוי בעלות אחרון',
-            // Status
             'rechev_lo_pail': 'פעילות הרכב',
             'rechev_butal': 'סטטוס רישום',
             'taarich_bitul': 'תאריך ביטול',
@@ -214,19 +261,22 @@
         // Tab switching
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-primary/30');
-                btn.classList.add('bg-background-light/30');
+                btn.classList.remove('bg-[#BF953F]', 'text-black');
+                btn.classList.add('bg-white/10', 'text-gray-300');
             });
             document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
 
-            document.getElementById(`tab-${tab}`).classList.add('bg-primary/30');
-            document.getElementById(`tab-${tab}`).classList.remove('bg-background-light/30');
+            document.getElementById(`tab-${tab}`).classList.add('bg-[#BF953F]', 'text-black');
+            document.getElementById(`tab-${tab}`).classList.remove('bg-white/10', 'text-gray-300');
             document.getElementById(`${tab}-content`).classList.remove('hidden');
         }
 
-        // Upload area
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
+        // Upload areas
+        const uploadTypeSelection = document.getElementById('uploadTypeSelection');
+        const uploadVehicle = document.getElementById('uploadVehicle');
+        const uploadLicense = document.getElementById('uploadLicense');
+        const fileInputVehicle = document.getElementById('fileInputVehicle');
+        const fileInputLicense = document.getElementById('fileInputLicense');
         const previewContainer = document.getElementById('previewContainer');
         const previewImage = document.getElementById('previewImage');
         const extractedPlate = document.getElementById('extractedPlate');
@@ -234,45 +284,45 @@
         const searchExtractedBtn = document.getElementById('searchExtractedBtn');
         const clearUploadBtn = document.getElementById('clearUploadBtn');
 
-        uploadArea.addEventListener('click', () => fileInput.click());
+        let currentUploadType = 'vehicle'; // 'vehicle' or 'license'
 
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('border-primary', 'bg-primary/10');
+        uploadVehicle.addEventListener('click', () => {
+            currentUploadType = 'vehicle';
+            fileInputVehicle.click();
         });
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('border-primary', 'bg-primary/10');
+        uploadLicense.addEventListener('click', () => {
+            currentUploadType = 'license';
+            fileInputLicense.click();
         });
 
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('border-primary', 'bg-primary/10');
-            const file = e.dataTransfer.files[0];
-            if (file) handleFileUpload(file);
-        });
-
-        fileInput.addEventListener('change', (e) => {
+        fileInputVehicle.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) handleFileUpload(file);
+            if (file) handleFileUpload(file, 'vehicle');
         });
 
-        async function handleFileUpload(file) {
+        fileInputLicense.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFileUpload(file, 'license');
+        });
+
+        async function handleFileUpload(file, uploadType) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImage.src = e.target.result;
                 previewContainer.classList.remove('hidden');
-                uploadArea.classList.add('hidden');
+                uploadTypeSelection.classList.add('hidden');
             };
             reader.readAsDataURL(file);
 
             extractedPlate.classList.add('hidden');
             searchExtractedBtn.disabled = true;
-            searchExtractedBtn.textContent = 'מזהה לוחית...';
+            searchExtractedBtn.textContent = uploadType === 'license' ? 'קורא רישיון...' : 'מזהה לוחית...';
 
             try {
                 const formData = new FormData();
                 formData.append('image', file);
+                formData.append('type', uploadType);
 
                 const response = await fetch(VISION_API, {
                     method: 'POST',
@@ -287,16 +337,15 @@
                     extractedPlate.classList.remove('hidden');
                     searchExtractedBtn.textContent = 'חפש רכב';
                     searchExtractedBtn.disabled = false;
-                    // Auto-search when plate is detected
                     searchVehicle(extractedPlateNumber);
                 } else {
-                    alert(data.error || 'לא זוהתה לוחית רישוי בתמונה');
+                    alert(data.error || (uploadType === 'license' ? 'לא זוהה מספר רישוי ברישיון' : 'לא זוהתה לוחית רישוי בתמונה'));
                     searchExtractedBtn.textContent = 'חפש רכב';
                     searchExtractedBtn.disabled = true;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('שגיאה בזיהוי לוחית הרישוי');
+                alert('שגיאה בזיהוי מספר הרישוי');
                 searchExtractedBtn.textContent = 'חפש רכב';
                 searchExtractedBtn.disabled = true;
             }
@@ -310,10 +359,11 @@
 
         clearUploadBtn.addEventListener('click', () => {
             previewContainer.classList.add('hidden');
-            uploadArea.classList.remove('hidden');
+            uploadTypeSelection.classList.remove('hidden');
             extractedPlate.classList.add('hidden');
             extractedPlateNumber = null;
-            fileInput.value = '';
+            fileInputVehicle.value = '';
+            fileInputLicense.value = '';
             searchExtractedBtn.disabled = true;
         });
 
@@ -338,11 +388,10 @@
             resultsSection.classList.remove('hidden');
             resultsContent.innerHTML = `
                 <div class="text-center py-12">
-                    <div class="inline-block h-10 w-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
-                    <p class="text-text-muted-light">מחפש נתונים...</p>
+                    <div class="inline-block h-10 w-10 border-4 border-[#BF953F]/30 border-t-[#BF953F] rounded-full animate-spin mb-4"></div>
+                    <p class="text-gray-400">מחפש נתונים...</p>
                 </div>
             `;
-            // Auto-scroll to results
             resultsSection.scrollIntoView({ behavior: 'smooth' });
 
             try {
@@ -352,8 +401,8 @@
                 if (!data.success) {
                     resultsContent.innerHTML = `
                         <div class="text-center py-12">
-                            <span class="material-symbols-outlined text-5xl text-text-muted-light mb-4">search_off</span>
-                            <p class="text-text-muted-light">${data.error || 'לא נמצאו תוצאות עבור מספר רישוי: ' + licensePlate}</p>
+                            <span class="material-symbols-outlined text-5xl text-gray-500 mb-4">search_off</span>
+                            <p class="text-gray-400">${data.error || 'לא נמצאו תוצאות עבור מספר רישוי: ' + licensePlate}</p>
                         </div>
                     `;
                     return;
@@ -380,7 +429,6 @@
         function displayResults(vehicle) {
             const plateNumber = vehicle.mispar_rechev || licensePlateInput.value;
 
-            // Define categories
             const categories = {
                 'סטטוס הרכב': {
                     icon: 'verified_user',
@@ -432,10 +480,9 @@
 
                         if (warningFields.includes(key)) {
                             const isWarning = value === true;
-                            const textColor = isWarning ? 'text-red-500' : 'text-green-500';
+                            const textColor = isWarning ? 'text-red-400' : 'text-green-400';
                             const icon = isWarning ? 'cancel' : 'check_circle';
 
-                            // Custom display values per field
                             if (key === 'rechev_lo_pail') {
                                 displayValue = isWarning ? 'לא פעיל' : 'פעיל';
                             } else if (key === 'rechev_butal') {
@@ -449,16 +496,44 @@
                                 displayValue = isWarning ? 'פג תוקף' + dateStr : 'בתוקף' + dateStr;
                             }
 
-                            items += `<div class="flex justify-between items-center py-1 border-b border-surface-light last:border-0">
-                                <span class="text-sm text-text-muted-light">${label}</span>
+                            items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
+                                <span class="text-sm text-gray-400">${label}</span>
                                 <span class="flex items-center gap-1 ${textColor} font-medium text-sm">
                                     <span class="material-symbols-outlined text-base">${icon}</span>${displayValue}
                                 </span>
                             </div>`;
+                        } else if (key === 'mispar_yadayim' && vehicle.historiat_baalut && vehicle.historiat_baalut.length > 0) {
+                            // Display ownership count with detailed history
+                            let historyHTML = `<div class="py-2 border-b border-white/5 last:border-0">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-400">${label}</span>
+                                    <span class="font-medium text-sm text-white">${displayValue}</span>
+                                </div>
+                                <div class="mt-2 bg-white/5 rounded-lg p-2">
+                                    <table class="w-full text-sm">
+                                        <thead>
+                                            <tr class="text-gray-500 text-xs">
+                                                <th class="text-right pb-1">יד</th>
+                                                <th class="text-right pb-1">סוג בעלות</th>
+                                                <th class="text-right pb-1">תאריך</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+
+                            for (const record of vehicle.historiat_baalut) {
+                                historyHTML += `<tr class="border-t border-white/5">
+                                    <td class="py-1 text-white">${record.yad}</td>
+                                    <td class="py-1 text-[#BF953F]">${record.sug_baalut || '-'}</td>
+                                    <td class="py-1 text-gray-300">${record.taarich || '-'}</td>
+                                </tr>`;
+                            }
+
+                            historyHTML += `</tbody></table></div></div>`;
+                            items += historyHTML;
                         } else {
-                            items += `<div class="flex justify-between items-center py-1 border-b border-surface-light last:border-0">
-                                <span class="text-sm text-text-muted-light">${label}</span>
-                                <span class="font-medium text-sm text-text-light">${displayValue}</span>
+                            items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
+                                <span class="text-sm text-gray-400">${label}</span>
+                                <span class="font-medium text-sm text-white">${displayValue}</span>
                             </div>`;
                         }
                     }
@@ -466,14 +541,14 @@
 
                 if (hasItems) {
                     categoriesHTML += `
-                        <div class="rounded-lg border border-surface-light bg-background-light overflow-hidden">
+                        <div class="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
                             <button onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.expand-icon').classList.toggle('rotate-180')"
-                                    class="w-full flex items-center justify-between p-3 hover:bg-surface-light/50 transition-colors">
+                                    class="w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary">${catData.icon}</span>
-                                    <span class="font-semibold text-text-light">${catName}</span>
+                                    <span class="material-symbols-outlined text-[#BF953F]">${catData.icon}</span>
+                                    <span class="font-semibold text-white">${catName}</span>
                                 </div>
-                                <span class="material-symbols-outlined expand-icon transition-transform">expand_more</span>
+                                <span class="material-symbols-outlined expand-icon transition-transform text-gray-400">expand_more</span>
                             </button>
                             <div class="hidden px-3 pb-3">${items}</div>
                         </div>
@@ -482,13 +557,13 @@
             }
 
             resultsContent.innerHTML = `
-                <div class="rounded-lg bg-surface-light p-4 mb-4">
+                <div class="rounded-lg bg-white/10 p-4 mb-4">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-col">
-                            <p class="text-xl font-bold text-text-light">
+                            <p class="text-xl font-bold text-white">
                                 ${vehicle.tozeret_nm || ''} ${vehicle.kinuy_mishari || ''}
                             </p>
-                            <div class="mt-1 flex flex-wrap gap-x-3 text-sm text-text-muted-light">
+                            <div class="mt-1 flex flex-wrap gap-x-3 text-sm text-gray-400">
                                 <span>${vehicle.shnat_yitzur || ''}</span>
                                 <span>•</span>
                                 <span>${vehicle.tzeva_rechev || ''}</span>
@@ -496,7 +571,7 @@
                                 <span>${vehicle.sug_delek_nm || ''}</span>
                             </div>
                         </div>
-                        <span class="bg-primary text-text-light px-4 py-2 rounded-lg text-xl font-extrabold tracking-widest" style="direction: ltr;">${plateNumber}</span>
+                        <span class="bg-[#BF953F] text-black px-4 py-2 rounded-lg text-xl font-extrabold tracking-widest" style="direction: ltr;">${plateNumber}</span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
