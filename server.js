@@ -134,15 +134,13 @@ function extractLicensePlate(text) {
     if (all8digit.length > 0) {
         const first8 = all8digit[0].num;
 
-        // If it starts with "1" and removing it gives a valid 7-digit, it's likely an IL prefix issue
+        // If it starts with "1", it's likely the IL marking being read as "1"
+        // Israeli plates are either 7-digit (old) or 8-digit (new starting with higher numbers)
+        // New 8-digit plates typically start with digits like 5, 6, 7, 8, 9
         if (first8.startsWith('1')) {
             const without1 = first8.substring(1);
-            // Check if this 7-digit appears in our 7-digit matches
-            const matching7 = all7digit.find(d => d.num === without1);
-            if (matching7) {
-                console.log('Detected IL->1 prefix issue, returning 7-digit:', without1);
-                return without1;
-            }
+            console.log('Detected IL->1 prefix issue, returning 7-digit:', without1);
+            return without1;
         }
 
         // Otherwise return the 8-digit
