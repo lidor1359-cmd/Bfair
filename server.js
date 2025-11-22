@@ -130,22 +130,32 @@ function extractLicensePlate(text) {
     console.log('7-digit numbers:', all7digit);
 
     // Step 4: Validate and choose best match
-    // Check for IL prefix false positive (when "IL" is read as "1" before a 7-digit plate)
+    // Prefer 7-digit if both exist (8-digit starting with 1 is likely IL prefix issue)
+    // Real 8-digit plates start with higher digits (5,6,7,8,9)
+    if (all7digit.length > 0 && all8digit.length > 0) {
+        const first8 = all8digit[0].num;
+        const first7 = all7digit[0].num;
+
+        // If 8-digit starts with "1" and ends with the 7-digit, it's IL prefix
+        if (first8.startsWith('1') && first8.endsWith(first7)) {
+            console.log('Detected IL->1 prefix, returning 7-digit:', first7);
+            return first7;
+        }
+    }
+
+    // Return 8-digit if it exists and doesn't start with 1
     if (all8digit.length > 0) {
         const first8 = all8digit[0].num;
-
-        // If it starts with "1", it's likely the IL marking being read as "1"
-        // Israeli plates are either 7-digit (old) or 8-digit (new starting with higher numbers)
-        // New 8-digit plates typically start with digits like 5, 6, 7, 8, 9
-        if (first8.startsWith('1')) {
-            const without1 = first8.substring(1);
-            console.log('Detected IL->1 prefix issue, returning 7-digit:', without1);
-            return without1;
+        if (!first8.startsWith('1')) {
+            console.log('Returning 8-digit:', first8);
+            return first8;
         }
-
-        // Otherwise return the 8-digit
-        console.log('Returning 8-digit:', first8);
-        return first8;
+        // If starts with 1, check if it's a real plate or IL issue
+        // Real 8-digit plates starting with 1 would be like 10000000+
+        // But currently Israeli plates haven't reached that range
+        const without1 = first8.substring(1);
+        console.log('8-digit starts with 1, returning without prefix:', without1);
+        return without1;
     }
 
     if (all7digit.length > 0) {
