@@ -86,58 +86,80 @@ async function extractTextFromImage(imageBuffer) {
 // Extract Israeli license plate pattern
 function extractLicensePlate(text) {
     console.log('=== Extracting plate from text ===');
+    console.log('Raw text:', text);
 
-    // Find formatted plates XXX-XX-XXX or XX-XXX-XX (highest priority - most reliable)
+    // Step 1: Clean text - remove common OCR errors from Israeli plates
+    // Remove "IL" that appears on plates (often misread as "1L" or "IL" or "1")
+    let cleanText = text
+        .replace(/\bIL\b/gi, '')           // Remove standalone "IL"
+        .replace(/\b1L\b/gi, '')           // Remove "1L" (IL misread)
+        .replace(/\bil\b/gi, '')           // Remove lowercase "il"
+        .replace(/ישראל/g, '')             // Remove "ישראל"
+        .replace(/ISRAEL/gi, '');          // Remove "ISRAEL"
+
+    console.log('Cleaned text:', cleanText);
+
+    // Step 2: Find formatted plates (highest priority - most reliable)
+    // Israeli plates: XX-XXX-XX (old 7-digit) or XXX-XX-XXX (new 8-digit)
     const formatted = [];
-    const fmtMatches = [...text.matchAll(/(\d{2,3})[-–:.\s]+(\d{2,3})[-–:.\s]+(\d{2,3})/g)];
+
+    // Match plates with various separators (dash, space, dot, colon)
+    const fmtMatches = [...cleanText.matchAll(/(\d{2,3})[-–—:.\s]+(\d{2,3})[-–—:.\s]+(\d{2,3})/g)];
     for (const m of fmtMatches) {
         const plate = m[1] + m[2] + m[3];
         if (plate.length === 7 || plate.length === 8) {
-            formatted.push({ num: plate, index: m.index });
+            formatted.push({ num: plate, index: m.index, formatted: `${m[1]}-${m[2]}-${m[3]}` });
         }
     }
 
-    console.log('Formatted plates:', formatted);
+    console.log('Formatted plates found:', formatted);
 
-    // If we found formatted plates, use them (most reliable)
     if (formatted.length > 0) {
+        // Sort by position - take the first one
         formatted.sort((a, b) => a.index - b.index);
-        console.log('Returning formatted:', formatted[0].num);
+        console.log('Returning formatted plate:', formatted[0].num);
         return formatted[0].num;
     }
 
-    // Find all 8-digit numbers (new format plates)
-    const all8digit = [...text.matchAll(/(\d{8})/g)].map(m => ({ num: m[1], index: m.index }));
-
-    // Find all 7-digit numbers (old format plates)
-    const all7digit = [...text.matchAll(/(\d{7})/g)].map(m => ({ num: m[1], index: m.index }));
+    // Step 3: Look for continuous digit sequences
+    // Find all 7 and 8 digit numbers
+    const all8digit = [...cleanText.matchAll(/\b(\d{8})\b/g)].map(m => ({ num: m[1], index: m.index }));
+    const all7digit = [...cleanText.matchAll(/\b(\d{7})\b/g)].map(m => ({ num: m[1], index: m.index }));
 
     console.log('8-digit numbers:', all8digit);
     console.log('7-digit numbers:', all7digit);
 
-    // Check if 8-digit numbers might be false positives (IL/1 prefix issue)
-    // If an 8-digit number starts with "1" and we have a 7-digit match, prefer the 7-digit
-    if (all8digit.length > 0 && all7digit.length > 0) {
-        const first8 = all8digit[0].num;
-        const first7 = all7digit[0].num;
-
-        // If 8-digit starts with "1" and contains the 7-digit number, use the 7-digit
-        if (first8.startsWith('1') && first8.includes(first7)) {
-            console.log('Detected IL prefix issue, returning 7-digit:', first7);
-            return first7;
-        }
-    }
-
+    // Step 4: Validate and choose best match
+    // Check for IL prefix false positive (when "IL" is read as "1" before a 7-digit plate)
     if (all8digit.length > 0) {
-        all8digit.sort((a, b) => a.index - b.index);
-        console.log('Returning 8-digit:', all8digit[0].num);
-        return all8digit[0].num;
+        const first8 = all8digit[0].num;
+
+        // If it starts with "1" and removing it gives a valid 7-digit, it's likely an IL prefix issue
+        if (first8.startsWith('1')) {
+            const without1 = first8.substring(1);
+            // Check if this 7-digit appears in our 7-digit matches
+            const matching7 = all7digit.find(d => d.num === without1);
+            if (matching7) {
+                console.log('Detected IL->1 prefix issue, returning 7-digit:', without1);
+                return without1;
+            }
+        }
+
+        // Otherwise return the 8-digit
+        console.log('Returning 8-digit:', first8);
+        return first8;
     }
 
     if (all7digit.length > 0) {
-        all7digit.sort((a, b) => a.index - b.index);
         console.log('Returning 7-digit:', all7digit[0].num);
         return all7digit[0].num;
+    }
+
+    // Step 5: Last resort - find any sequence that looks like a plate
+    const anyNumbers = [...text.matchAll(/(\d{7,8})/g)];
+    if (anyNumbers.length > 0) {
+        console.log('Last resort, returning:', anyNumbers[0][1]);
+        return anyNumbers[0][1];
     }
 
     return null;
