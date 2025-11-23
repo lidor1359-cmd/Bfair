@@ -103,20 +103,36 @@ function extractLicensePlate(text) {
     // Israeli plates: XX-XXX-XX (old 7-digit) or XXX-XX-XXX (new 8-digit)
     const formatted = [];
 
-    // Match plates with various separators (dash, space, dot, colon)
-    const fmtMatches = [...cleanText.matchAll(/(\d{2,3})[-–—:.\s]+(\d{2,3})[-–—:.\s]+(\d{2,3})/g)];
-    for (const m of fmtMatches) {
+    // Match plates with dash separators specifically (most reliable)
+    const dashMatches = [...cleanText.matchAll(/(\d{2,3})-(\d{2,3})-(\d{2,3})/g)];
+    for (const m of dashMatches) {
         const plate = m[1] + m[2] + m[3];
         if (plate.length === 7 || plate.length === 8) {
-            formatted.push({ num: plate, index: m.index, formatted: `${m[1]}-${m[2]}-${m[3]}` });
+            formatted.push({ num: plate, index: m.index, formatted: `${m[1]}-${m[2]}-${m[3]}`, priority: 1 });
+        }
+    }
+
+    // Also match with other separators but lower priority
+    const otherMatches = [...cleanText.matchAll(/(\d{2,3})[–—:.\s]+(\d{2,3})[–—:.\s]+(\d{2,3})/g)];
+    for (const m of otherMatches) {
+        const plate = m[1] + m[2] + m[3];
+        if (plate.length === 7 || plate.length === 8) {
+            // Check if not already found with dash
+            const exists = formatted.some(f => f.num === plate);
+            if (!exists) {
+                formatted.push({ num: plate, index: m.index, formatted: `${m[1]}-${m[2]}-${m[3]}`, priority: 2 });
+            }
         }
     }
 
     console.log('Formatted plates found:', formatted);
 
     if (formatted.length > 0) {
-        // Sort by position - take the first one
-        formatted.sort((a, b) => a.index - b.index);
+        // Sort by priority first, then by position
+        formatted.sort((a, b) => {
+            if (a.priority !== b.priority) return a.priority - b.priority;
+            return a.index - b.index;
+        });
         let plate = formatted[0].num;
 
         // Check if this is 8-digit starting with 1 (IL prefix issue)
