@@ -303,6 +303,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const CAR_DEALERS = 'eb74ad8c-ffcd-43bb-949c-2244fc8a8651'; // סוחרי רכב - לשימוש עתידי
         const DISABILITY_BADGES = 'c8b9f9c8-4612-4068-934f-d4acd2e3c06e'; // רכבים עם תו נכה
         const TIRE_TOWING_INFO = '0866573c-40cd-4ca8-91d2-9dd2d7a492e5'; // מידע צמיגים וגרירה
+        const PUBLIC_VEHICLES = 'cf29862d-ca25-4691-84f6-1be60dcb4a1e'; // רכב ציבורי
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -539,6 +540,27 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             };
         }
 
+        // 10. Check if it's a public vehicle (bus, taxi, etc.)
+        let publicVehicleInfo = null;
+        const publicVehicleResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${PUBLIC_VEHICLES}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const publicVehicleData = await publicVehicleResponse.json();
+        if (publicVehicleData.success && publicVehicleData.result.records.length > 0) {
+            const record = publicVehicleData.result.records[0];
+            publicVehicleInfo = {
+                sug_rechev_cd: record.sug_rechev_cd,
+                sug_rechev_nm: record.sug_rechev_nm,
+                sug_rechev_EU_cd: record.sug_rechev_EU_cd,
+                sug_rechev_EU_nm: record.sug_rechev_EU_nm,
+                mispar_mekomot: record.mispar_mekomot,
+                mispar_mekomot_leyd_nahag: record.mispar_mekomot_leyd_nahag,
+                bitul_cd: record.bitul_cd,
+                bitul_nm: record.bitul_nm,
+                bitul_dt: record.bitul_dt
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -643,7 +665,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 tav_nacheh: disabilityBadge,
 
                 // Tire and towing info
-                tire_towing: tireTowingInfo
+                tire_towing: tireTowingInfo,
+
+                // Public vehicle info (bus, taxi, etc.)
+                rechev_tziburi: publicVehicleInfo
             }
         });
 
