@@ -324,12 +324,24 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                     mispar_rechev: scrappedRecord.mispar_rechev,
                     tozeret_nm: scrappedRecord.tozeret_nm,
                     kinuy_mishari: scrappedRecord.kinuy_mishari,
+                    degem_nm: scrappedRecord.degem_nm,
                     shnat_yitzur: scrappedRecord.shnat_yitzur,
                     tzeva_rechev: scrappedRecord.tzeva_rechev,
                     sug_delek_nm: scrappedRecord.sug_delek_nm,
+                    sug_rechev_nm: scrappedRecord.sug_rechev_nm,
                     baalut: scrappedRecord.baalut,
                     misgeret: scrappedRecord.misgeret,
-                    moed_aliya_lakvish: scrappedRecord.moed_aliya_lakvish
+                    moed_aliya_lakvish: scrappedRecord.moed_aliya_lakvish,
+                    mishkal_kolel: scrappedRecord.mishkal_kolel,
+                    ramat_gimur: scrappedRecord.ramat_gimur,
+                    ramat_eivzur_betihuty: scrappedRecord.ramat_eivzur_betihuty,
+                    kvutzat_zihum: scrappedRecord.kvutzat_zihum,
+                    zmig_kidmi: scrappedRecord.zmig_kidmi,
+                    zmig_ahori: scrappedRecord.zmig_ahori,
+                    tozar_manoa: scrappedRecord.tozar_manoa,
+                    degem_manoa: scrappedRecord.degem_manoa,
+                    mispar_manoa: scrappedRecord.mispar_manoa,
+                    horaat_rishum: scrappedRecord.horaat_rishum
                 };
                 isFromScrappedOnly = true;
             } else {
@@ -426,10 +438,21 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                     shnat_yitzur: record.shnat_yitzur,
                     tozeret_nm: record.tozeret_nm,
                     kinuy_mishari: record.kinuy_mishari,
+                    degem_nm: record.degem_nm,
                     sug_delek_nm: record.sug_delek_nm,
+                    sug_rechev_nm: record.sug_rechev_nm,
                     tzeva_rechev: record.tzeva_rechev,
                     baalut: record.baalut,
-                    misgeret: record.misgeret
+                    misgeret: record.misgeret,
+                    mishkal_kolel: record.mishkal_kolel,
+                    ramat_gimur: record.ramat_gimur,
+                    ramat_eivzur_betihuty: record.ramat_eivzur_betihuty,
+                    kvutzat_zihum: record.kvutzat_zihum,
+                    zmig_kidmi: record.zmig_kidmi,
+                    zmig_ahori: record.zmig_ahori,
+                    tozar_manoa: record.tozar_manoa,
+                    degem_manoa: record.degem_manoa,
+                    mispar_manoa: record.mispar_manoa
                 };
             }
         } else {
@@ -447,10 +470,21 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                     shnat_yitzur: record.shnat_yitzur,
                     tozeret_nm: record.tozeret_nm,
                     kinuy_mishari: record.kinuy_mishari,
+                    degem_nm: record.degem_nm,
                     sug_delek_nm: record.sug_delek_nm,
+                    sug_rechev_nm: record.sug_rechev_nm,
                     tzeva_rechev: record.tzeva_rechev,
                     baalut: record.baalut,
-                    misgeret: record.misgeret
+                    misgeret: record.misgeret,
+                    mishkal_kolel: record.mishkal_kolel,
+                    ramat_gimur: record.ramat_gimur,
+                    ramat_eivzur_betihuty: record.ramat_eivzur_betihuty,
+                    kvutzat_zihum: record.kvutzat_zihum,
+                    zmig_kidmi: record.zmig_kidmi,
+                    zmig_ahori: record.zmig_ahori,
+                    tozar_manoa: record.tozar_manoa,
+                    degem_manoa: record.degem_manoa,
+                    mispar_manoa: record.mispar_manoa
                 };
             }
         }
