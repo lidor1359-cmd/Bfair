@@ -507,6 +507,20 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             }));
         }
 
+        // 8. Check if vehicle has disability badge
+        let disabilityBadge = null;
+        const disabilityResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${DISABILITY_BADGES}&filters={"MISPAR RECHEV":${plateNumber}}`
+        );
+        const disabilityData = await disabilityResponse.json();
+        if (disabilityData.success && disabilityData.result.records.length > 0) {
+            const record = disabilityData.result.records[0];
+            disabilityBadge = {
+                taarich_hafaka: record['TAARICH HAFAKAT TAG'],
+                sug_tav: record['SUG TAV']
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -598,7 +612,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 tipul_baichor: serviceOverdue,
 
                 // Recalls
-                recalls: recalls
+                recalls: recalls,
+
+                // Disability badge
+                tav_nacheh: disabilityBadge
             }
         });
 
