@@ -382,16 +382,27 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             isInactive = true;
         }
 
-        // 6. Check if vehicle is scrapped
+        // 6. Check if vehicle is scrapped (removed from road)
         let isScrapped = false;
-        let scrappedDate = null;
+        let scrappedInfo = null;
         const scrappedResponse = await fetch(
             `https://data.gov.il/api/3/action/datastore_search?resource_id=${SCRAPPED_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
         );
         const scrappedData = await scrappedResponse.json();
         if (scrappedData.success && scrappedData.result.records.length > 0) {
             isScrapped = true;
-            scrappedDate = scrappedData.result.records[0].bitul_dt;
+            const record = scrappedData.result.records[0];
+            scrappedInfo = {
+                bitul_dt: record.bitul_dt,
+                moed_aliya_lakvish: record.moed_aliya_lakvish,
+                shnat_yitzur: record.shnat_yitzur,
+                tozeret_nm: record.tozeret_nm,
+                kinuy_mishari: record.kinuy_mishari,
+                sug_delek_nm: record.sug_delek_nm,
+                tzeva_rechev: record.tzeva_rechev,
+                baalut: record.baalut,
+                misgeret: record.misgeret
+            };
         }
 
         // 7. Get recalls/safety issues
@@ -497,7 +508,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 // Warnings/Flags
                 rechev_lo_pail: isInactive,
                 rechev_butal: isScrapped,
-                taarich_bitul: scrappedDate,
+                pirtei_bitul: scrappedInfo,
                 tipul_baichor: serviceOverdue,
 
                 // Recalls

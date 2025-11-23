@@ -439,12 +439,37 @@
             // Check for warnings
             const warnings = [];
             if (vehicle.rechev_lo_pail) warnings.push('הרכב לא פעיל');
-            if (vehicle.rechev_butal) warnings.push('הרכב הורד מהכביש');
+            if (vehicle.rechev_butal) {
+                let cancelMsg = 'הרכב הורד מהכביש';
+                if (vehicle.pirtei_bitul && vehicle.pirtei_bitul.bitul_dt) {
+                    const cancelDate = new Date(vehicle.pirtei_bitul.bitul_dt);
+                    if (!isNaN(cancelDate)) {
+                        cancelMsg += ' בתאריך ' + cancelDate.toLocaleDateString('he-IL');
+                    }
+                }
+                warnings.push(cancelMsg);
+            }
             if (vehicle.tipul_baichor) warnings.push('טסט לא בתוקף');
             if (vehicle.recalls && vehicle.recalls.length > 0) warnings.push('קיימות קריאות חוזר');
 
             let warningBanner = '';
-            if (warnings.length > 0) {
+
+            // Special prominent warning for scrapped vehicles
+            if (vehicle.rechev_butal) {
+                warningBanner = `
+                    <div class="bg-red-600/30 border-2 border-red-500 rounded-lg p-6 mb-4 animate-pulse">
+                        <div class="flex items-center justify-center gap-3">
+                            <span class="material-symbols-outlined text-red-500 text-4xl">dangerous</span>
+                            <div class="text-center">
+                                <p class="text-red-400 font-bold text-xl mb-1">רכב זה ירד מהכביש!</p>
+                                <p class="text-red-300 text-sm">הרכב בוטל סופית ואינו כשיר לנסיעה</p>
+                                ${vehicle.pirtei_bitul && vehicle.pirtei_bitul.bitul_dt ? `<p class="text-red-300 text-xs mt-1">תאריך ביטול: ${new Date(vehicle.pirtei_bitul.bitul_dt).toLocaleDateString('he-IL')}</p>` : ''}
+                            </div>
+                            <span class="material-symbols-outlined text-red-500 text-4xl">dangerous</span>
+                        </div>
+                    </div>
+                `;
+            } else if (warnings.length > 0) {
                 warningBanner = `
                     <div class="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-4">
                         <div class="flex items-start gap-3">
