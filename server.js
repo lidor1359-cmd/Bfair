@@ -213,7 +213,14 @@ function extractLicensePlate(text) {
         return all7digit[0].num;
     }
 
-    // Step 5: Last resort - find any sequence that looks like a plate
+    // Step 5: Fallback - if all 8-digit were filtered, return the first one anyway
+    // Better to return something than nothing
+    if (all8digit.length > 0) {
+        console.log('Fallback: returning first 8-digit despite validation:', all8digit[0].num);
+        return all8digit[0].num;
+    }
+
+    // Step 6: Last resort - find any sequence that looks like a plate
     const anyNumbers = [...text.matchAll(/(\d{7,8})/g)];
     if (anyNumbers.length > 0) {
         console.log('Last resort, returning:', anyNumbers[0][1]);
@@ -854,6 +861,55 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             success: false,
             error: 'שגיאה בחיפוש רכב'
         });
+    }
+});
+
+// Garages and licensing centers search endpoint
+app.get('/api/garages', async (req, res) => {
+    try {
+        const { yishuv, sug_mosah, miktzoa } = req.query;
+        const GARAGES_DB = 'bb68386a-a331-4bbc-b668-bba2766d517d';
+
+        let url = `https://data.gov.il/api/3/action/datastore_search?resource_id=${GARAGES_DB}&limit=100`;
+
+        // Build filters
+        const filters = {};
+        if (yishuv) filters.yishuv = yishuv;
+        if (sug_mosah) filters.sug_mosah = sug_mosah;
+        if (miktzoa) filters.miktzoa = miktzoa;
+
+        if (Object.keys(filters).length > 0) {
+            url += `&filters=${JSON.stringify(filters)}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success) {
+            return res.status(500).json({ success: false, error: 'שגיאה בחיפוש מוסכים' });
+        }
+
+        const garages = data.result.records.map(r => ({
+            mispar_mosah: r.mispar_mosah,
+            shem_mosah: r.shem_mosah,
+            sug_mosah: r.sug_mosah,
+            ktovet: r.ktovet,
+            yishuv: r.yishuv,
+            telephone: r.telephone,
+            mikud: r.mikud,
+            miktzoa: r.miktzoa,
+            menahel_miktzoa: r.menahel_miktzoa
+        }));
+
+        res.json({
+            success: true,
+            total: data.result.total,
+            garages: garages
+        });
+
+    } catch (error) {
+        console.error('Garages search error:', error);
+        res.status(500).json({ success: false, error: 'שגיאה בחיפוש מוסכים' });
     }
 });
 
