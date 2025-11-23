@@ -36,6 +36,8 @@ async function extractTextFromImage(imageBuffer) {
     }
 
     const base64Content = imageBuffer.toString('base64');
+    console.log('Image buffer size:', imageBuffer.length, 'bytes');
+    console.log('Base64 content length:', base64Content.length);
 
     const response = await fetch(
         `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
@@ -67,13 +69,17 @@ async function extractTextFromImage(imageBuffer) {
     }
 
     const result = await response.json();
+    console.log('Vision API response status:', response.status);
+    console.log('Vision API response:', JSON.stringify(result, null, 2).substring(0, 1000));
 
     // Check for API errors in response
     if (result.responses?.[0]?.error) {
+        console.error('Vision API error:', result.responses[0].error);
         throw new Error(`Vision API: ${result.responses[0].error.message}`);
     }
 
     const textAnnotations = result.responses?.[0]?.textAnnotations || [];
+    console.log('Text annotations count:', textAnnotations.length);
     const fullText = textAnnotations.length > 0 ? textAnnotations[0].description || '' : '';
 
     console.log('=== OCR FULL TEXT ===');
