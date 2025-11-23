@@ -305,6 +305,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const TIRE_TOWING_INFO = '0866573c-40cd-4ca8-91d2-9dd2d7a492e5'; // מידע צמיגים וגרירה
         const PUBLIC_VEHICLES = 'cf29862d-ca25-4691-84f6-1be60dcb4a1e'; // רכב ציבורי
         const SAFETY_DISCOUNT = '83bfb278-7be1-4dab-ae2d-40125a923da1'; // הנחה באגרת רישוי - מערכות בטיחות
+        const PERSONAL_IMPORT = '03adc637-b6fe-402b-9937-7c3d3afc9140'; // יבוא אישי
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -576,6 +577,22 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             };
         }
 
+        // 12. Check if it's a personal import vehicle
+        let personalImportInfo = null;
+        const personalImportResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${PERSONAL_IMPORT}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const personalImportData = await personalImportResponse.json();
+        if (personalImportData.success && personalImportData.result.records.length > 0) {
+            const record = personalImportData.result.records[0];
+            personalImportInfo = {
+                sug_yevu: record.sug_yevu,
+                tozeret_eretz_nm: record.tozeret_eretz_nm,
+                shilda: record.shilda,
+                nefach_manoa: record.nefach_manoa
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -686,7 +703,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 rechev_tziburi: publicVehicleInfo,
 
                 // Safety systems discount eligibility
-                hanacha_betihuty: safetyDiscountInfo
+                hanacha_betihuty: safetyDiscountInfo,
+
+                // Personal import info
+                yevu_ishi: personalImportInfo
             }
         });
 
