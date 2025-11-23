@@ -300,6 +300,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const INACTIVE_VEHICLES = 'f6efe89a-fb3d-43a4-bb61-9bf12a9b9099';
         const SCRAPPED_VEHICLES = '851ecab1-0622-4dbe-a6c7-f950cf82abf9';
         const RECALLS = '36bf1404-0be4-49d2-82dc-2f1ead4a8b93';
+        const CAR_DEALERS = 'eb74ad8c-ffcd-43bb-949c-2244fc8a8651'; // סוחרי רכב - לשימוש עתידי
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
