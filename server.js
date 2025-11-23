@@ -924,6 +924,50 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
+// Debug endpoint to test Vision API
+app.post('/api/debug-vision', upload.single('image'), async (req, res) => {
+    try {
+        const apiKey = process.env.GOOGLE_API_KEY;
+
+        if (!apiKey) {
+            return res.json({ error: 'GOOGLE_API_KEY not configured', hasKey: false });
+        }
+
+        if (!req.file) {
+            return res.json({ error: 'No file provided', hasKey: true, keyLength: apiKey.length });
+        }
+
+        const base64Content = req.file.buffer.toString('base64');
+
+        const response = await fetch(
+            `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    requests: [{
+                        image: { content: base64Content },
+                        features: [{ type: 'TEXT_DETECTION', maxResults: 10 }]
+                    }]
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        res.json({
+            hasKey: true,
+            keyLength: apiKey.length,
+            bufferSize: req.file.buffer.length,
+            base64Length: base64Content.length,
+            httpStatus: response.status,
+            visionResponse: result
+        });
+    } catch (error) {
+        res.json({ error: error.message, stack: error.stack });
+    }
+});
+
 // For local development
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
