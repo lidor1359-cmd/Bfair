@@ -153,6 +153,16 @@ function extractLicensePlate(text) {
     console.log('8-digit numbers:', all8digit);
     console.log('7-digit numbers:', all7digit);
 
+    // Filter valid Israeli 8-digit plates (currently start with 5-9, not 1-4)
+    const valid8digit = all8digit.filter(p => {
+        const firstDigit = p.num[0];
+        // Valid Israeli 8-digit plates start with 5, 6, 7, 8, or 9
+        // Plates starting with 1-4 are likely false matches (model numbers like 350xxxx)
+        return ['5', '6', '7', '8', '9'].includes(firstDigit);
+    });
+
+    console.log('Valid 8-digit plates:', valid8digit);
+
     // Step 4: Validate and choose best match
     // Prefer 7-digit if both exist (8-digit starting with 1 is likely IL prefix issue)
     // Real 8-digit plates start with higher digits (5,6,7,8,9)
@@ -167,19 +177,25 @@ function extractLicensePlate(text) {
         }
     }
 
-    // Return 8-digit if it exists and doesn't start with 1
+    // Return valid 8-digit if it exists
+    if (valid8digit.length > 0) {
+        console.log('Returning valid 8-digit:', valid8digit[0].num);
+        return valid8digit[0].num;
+    }
+
+    // Fallback to any 8-digit that doesn't start with 1-4
     if (all8digit.length > 0) {
         const first8 = all8digit[0].num;
-        if (!first8.startsWith('1')) {
+        if (!['1', '2', '3', '4'].includes(first8[0])) {
             console.log('Returning 8-digit:', first8);
             return first8;
         }
         // If starts with 1, check if it's a real plate or IL issue
-        // Real 8-digit plates starting with 1 would be like 10000000+
-        // But currently Israeli plates haven't reached that range
-        const without1 = first8.substring(1);
-        console.log('8-digit starts with 1, returning without prefix:', without1);
-        return without1;
+        if (first8.startsWith('1')) {
+            const without1 = first8.substring(1);
+            console.log('8-digit starts with 1, returning without prefix:', without1);
+            return without1;
+        }
     }
 
     if (all7digit.length > 0) {
