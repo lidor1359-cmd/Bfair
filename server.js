@@ -304,6 +304,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const DISABILITY_BADGES = 'c8b9f9c8-4612-4068-934f-d4acd2e3c06e'; // רכבים עם תו נכה
         const TIRE_TOWING_INFO = '0866573c-40cd-4ca8-91d2-9dd2d7a492e5'; // מידע צמיגים וגרירה
         const PUBLIC_VEHICLES = 'cf29862d-ca25-4691-84f6-1be60dcb4a1e'; // רכב ציבורי
+        const SAFETY_DISCOUNT = '83bfb278-7be1-4dab-ae2d-40125a923da1'; // הנחה באגרת רישוי - מערכות בטיחות
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -561,6 +562,20 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             };
         }
 
+        // 11. Check if eligible for safety systems discount
+        let safetyDiscountInfo = null;
+        const safetyDiscountResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${SAFETY_DISCOUNT}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const safetyDiscountData = await safetyDiscountResponse.json();
+        if (safetyDiscountData.success && safetyDiscountData.result.records.length > 0) {
+            const record = safetyDiscountData.result.records[0];
+            safetyDiscountInfo = {
+                eligible: true,
+                updated_dt: record.updated_dt
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -668,7 +683,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 tire_towing: tireTowingInfo,
 
                 // Public vehicle info (bus, taxi, etc.)
-                rechev_tziburi: publicVehicleInfo
+                rechev_tziburi: publicVehicleInfo,
+
+                // Safety systems discount eligibility
+                hanacha_betihuty: safetyDiscountInfo
             }
         });
 
