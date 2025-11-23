@@ -333,6 +333,8 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         let vehicle = null;
         let isFromScrappedOnly = false;
 
+        let isFromPersonalImportOnly = false;
+
         if (!vehicleData.success || vehicleData.result.records.length === 0) {
             // Vehicle not in main registry - check if it's in scrapped vehicles
             const scrappedCheckResponse = await fetch(
@@ -368,10 +370,39 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 };
                 isFromScrappedOnly = true;
             } else {
-                return res.status(404).json({
-                    success: false,
-                    error: 'לא נמצא רכב עם מספר זה'
-                });
+                // Check if it's a personal import vehicle
+                const personalImportCheckResponse = await fetch(
+                    `https://data.gov.il/api/3/action/datastore_search?resource_id=${PERSONAL_IMPORT}&filters={"mispar_rechev":${plateNumber}}&limit=1`
+                );
+                const personalImportCheckData = await personalImportCheckResponse.json();
+
+                if (personalImportCheckData.success && personalImportCheckData.result.records.length > 0) {
+                    // Vehicle found in personal import database - use its data
+                    const importRecord = personalImportCheckData.result.records[0];
+                    vehicle = {
+                        mispar_rechev: importRecord.mispar_rechev,
+                        tozeret_nm: importRecord.tozeret_nm,
+                        kinuy_mishari: importRecord.kinuy_mishari,
+                        degem_nm: importRecord.degem_nm,
+                        shnat_yitzur: importRecord.shnat_yitzur,
+                        tzeva_rechev: importRecord.tzeva_rechev,
+                        sug_delek_nm: importRecord.sug_delek_nm,
+                        sug_rechev_nm: importRecord.sug_rechev_nm,
+                        baalut: importRecord.baalut,
+                        misgeret: importRecord.shilda,
+                        moed_aliya_lakvish: importRecord.moed_aliya_lakvish,
+                        mishkal_kolel: importRecord.mishkal_kolel,
+                        ramat_gimur: importRecord.ramat_gimur,
+                        zmig_kidmi: importRecord.zmig_kidmi,
+                        zmig_ahori: importRecord.zmig_ahori
+                    };
+                    isFromPersonalImportOnly = true;
+                } else {
+                    return res.status(404).json({
+                        success: false,
+                        error: 'לא נמצא רכב עם מספר זה'
+                    });
+                }
             }
         } else {
             vehicle = vehicleData.result.records[0];
@@ -732,6 +763,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 rechev_butal: isScrapped,
                 pirtei_bitul: scrappedInfo,
                 tipul_baichor: serviceOverdue,
+                yevu_ishi_bilbad: isFromPersonalImportOnly,
 
                 // Recalls
                 recalls: recalls,
