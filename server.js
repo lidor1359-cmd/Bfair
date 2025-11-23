@@ -349,6 +349,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const SAFETY_DISCOUNT = '83bfb278-7be1-4dab-ae2d-40125a923da1'; // הנחה באגרת רישוי - מערכות בטיחות
         const PERSONAL_IMPORT = '03adc637-b6fe-402b-9937-7c3d3afc9140'; // יבוא אישי
         const MOTORCYCLES = 'bf9df4e2-d90d-4c0a-a400-19e15af8e95f'; // רכב דו גלגלי
+        const HEAVY_TRUCKS = 'cd3acc5c-03c3-4c89-9c54-d40f93c0d790'; // רכב מעל 3.5 טון
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -693,6 +694,36 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             };
         }
 
+        // 14. Check if it's a heavy truck (over 3.5 tons)
+        let heavyTruckInfo = null;
+        const heavyTruckResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${HEAVY_TRUCKS}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const heavyTruckData = await heavyTruckResponse.json();
+        if (heavyTruckData.success && heavyTruckData.result.records.length > 0) {
+            const record = heavyTruckData.result.records[0];
+            heavyTruckInfo = {
+                tozeret_nm: record.tozeret_nm,
+                tozeret_eretz_nm: record.tozeret_eretz_nm,
+                degem_nm: record.degem_nm,
+                shnat_yitzur: record.shnat_yitzur,
+                sug_delek_nm: record.sug_delek_nm,
+                mishkal_kolel: record.mishkal_kolel,
+                mishkal_azmi: record.mishkal_azmi,
+                mishkal_mitan_harama: record.mishkal_mitan_harama,
+                nefach_manoa: record.nefach_manoa,
+                degem_manoa: record.degem_manoa,
+                hanaa_nm: record.hanaa_nm,
+                tkina_EU: record.tkina_EU,
+                kvutzat_sug_rechev: record.kvutzat_sug_rechev,
+                grira_nm: record.grira_nm,
+                zmig_kidmi: record.zmig_kidmi,
+                zmig_ahori: record.zmig_ahori,
+                mispar_mekomot: record.mispar_mekomot,
+                mispar_shilda: record.mispar_shilda
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -810,7 +841,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 yevu_ishi: personalImportInfo,
 
                 // Motorcycle info (two-wheeled vehicles)
-                ofanoa: motorcycleInfo
+                ofanoa: motorcycleInfo,
+
+                // Heavy truck info (over 3.5 tons)
+                rechev_kaved: heavyTruckInfo
             }
         });
 
