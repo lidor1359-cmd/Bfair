@@ -306,6 +306,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const PUBLIC_VEHICLES = 'cf29862d-ca25-4691-84f6-1be60dcb4a1e'; // רכב ציבורי
         const SAFETY_DISCOUNT = '83bfb278-7be1-4dab-ae2d-40125a923da1'; // הנחה באגרת רישוי - מערכות בטיחות
         const PERSONAL_IMPORT = '03adc637-b6fe-402b-9937-7c3d3afc9140'; // יבוא אישי
+        const MOTORCYCLES = 'bf9df4e2-d90d-4c0a-a400-19e15af8e95f'; // רכב דו גלגלי
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -593,6 +594,32 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             };
         }
 
+        // 13. Check if it's a motorcycle (two-wheeled vehicle)
+        let motorcycleInfo = null;
+        const motorcycleResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${MOTORCYCLES}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const motorcycleData = await motorcycleResponse.json();
+        if (motorcycleData.success && motorcycleData.result.records.length > 0) {
+            const record = motorcycleData.result.records[0];
+            motorcycleInfo = {
+                tozeret_nm: record.tozeret_nm,
+                tozeret_eretz_nm: record.tozeret_eretz_nm,
+                degem_nm: record.degem_nm,
+                shnat_yitzur: record.shnat_yitzur,
+                sug_delek_nm: record.sug_delek_nm,
+                mishkal_kolel: record.mishkal_kolel,
+                mida_zmig_kidmi: record.mida_zmig_kidmi,
+                mida_zmig_ahori: record.mida_zmig_ahori,
+                nefach_manoa: record.nefach_manoa,
+                hespek: record.hespek,
+                misgeret: record.misgeret,
+                sug_rechev_nm: record.sug_rechev_nm,
+                baalut: record.baalut,
+                mispar_mekomot: record.mispar_mekomot
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -706,7 +733,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 hanacha_betihuty: safetyDiscountInfo,
 
                 // Personal import info
-                yevu_ishi: personalImportInfo
+                yevu_ishi: personalImportInfo,
+
+                // Motorcycle info (two-wheeled vehicles)
+                ofanoa: motorcycleInfo
             }
         });
 
