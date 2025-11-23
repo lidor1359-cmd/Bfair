@@ -302,6 +302,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         const RECALLS = '36bf1404-0be4-49d2-82dc-2f1ead4a8b93';
         const CAR_DEALERS = 'eb74ad8c-ffcd-43bb-949c-2244fc8a8651'; // סוחרי רכב - לשימוש עתידי
         const DISABILITY_BADGES = 'c8b9f9c8-4612-4068-934f-d4acd2e3c06e'; // רכבים עם תו נכה
+        const TIRE_TOWING_INFO = '0866573c-40cd-4ca8-91d2-9dd2d7a492e5'; // מידע צמיגים וגרירה
 
         // 1. Get basic vehicle info
         const vehicleResponse = await fetch(
@@ -521,6 +522,23 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
             };
         }
 
+        // 9. Get tire and towing info
+        let tireTowingInfo = null;
+        const tireTowingResponse = await fetch(
+            `https://data.gov.il/api/3/action/datastore_search?resource_id=${TIRE_TOWING_INFO}&filters={"mispar_rechev":${plateNumber}}`
+        );
+        const tireTowingData = await tireTowingResponse.json();
+        if (tireTowingData.success && tireTowingData.result.records.length > 0) {
+            const record = tireTowingData.result.records[0];
+            tireTowingInfo = {
+                kod_omes_tzmig_kidmi: record.kod_omes_tzmig_kidmi,
+                kod_omes_tzmig_ahori: record.kod_omes_tzmig_ahori,
+                kod_mehirut_tzmig_kidmi: record.kod_mehirut_tzmig_kidmi,
+                kod_mehirut_tzmig_ahori: record.kod_mehirut_tzmig_ahori,
+                grira_nm: record.grira_nm
+            };
+        }
+
         // Calculate if service is overdue
         let serviceOverdue = false;
         if (vehicle.tokef_dt) {
@@ -537,14 +555,21 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 tozeret_nm: vehicle.tozeret_nm,
                 kinuy_mishari: vehicle.kinuy_mishari,
                 degem_nm: vehicle.degem_nm,
+                sug_degem: vehicle.sug_degem,
                 shnat_yitzur: vehicle.shnat_yitzur,
                 tzeva_rechev: vehicle.tzeva_rechev,
+                tzeva_cd: vehicle.tzeva_cd,
                 sug_delek_nm: vehicle.sug_delek_nm,
                 baalut: vehicle.baalut,
                 ramat_gimur: vehicle.ramat_gimur,
+                ramat_eivzur_betihuty: vehicle.ramat_eivzur_betihuty,
+                kvutzat_zihum: vehicle.kvutzat_zihum,
                 misgeret: vehicle.misgeret,
                 moed_aliya_lakvish: vehicle.moed_aliya_lakvish,
                 tokef_dt: vehicle.tokef_dt,
+                mivchan_acharon_dt: vehicle.mivchan_acharon_dt,
+                horaat_rishum: vehicle.horaat_rishum,
+                degem_manoa: vehicle.degem_manoa,
 
                 // Tires
                 zmig_kidmi: vehicle.zmig_kidmi,
@@ -615,7 +640,10 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                 recalls: recalls,
 
                 // Disability badge
-                tav_nacheh: disabilityBadge
+                tav_nacheh: disabilityBadge,
+
+                // Tire and towing info
+                tire_towing: tireTowingInfo
             }
         });
 
