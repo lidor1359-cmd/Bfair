@@ -103,11 +103,21 @@ function extractLicensePlate(text) {
     // Israeli plates: XX-XXX-XX (old 7-digit) or XXX-XX-XXX (new 8-digit)
     const formatted = [];
 
+    // Helper function to check if plate number is valid Israeli format
+    const isValidIsraeliPlate = (plateNum) => {
+        if (plateNum.length === 7) return true; // All 7-digit plates are valid
+        if (plateNum.length === 8) {
+            // 8-digit plates must start with 5-9 (not 1-4)
+            return ['5', '6', '7', '8', '9'].includes(plateNum[0]);
+        }
+        return false;
+    };
+
     // Match plates with dash separators specifically (most reliable)
     const dashMatches = [...cleanText.matchAll(/(\d{2,3})-(\d{2,3})-(\d{2,3})/g)];
     for (const m of dashMatches) {
         const plate = m[1] + m[2] + m[3];
-        if (plate.length === 7 || plate.length === 8) {
+        if ((plate.length === 7 || plate.length === 8) && isValidIsraeliPlate(plate)) {
             formatted.push({ num: plate, index: m.index, formatted: `${m[1]}-${m[2]}-${m[3]}`, priority: 1 });
         }
     }
@@ -116,7 +126,7 @@ function extractLicensePlate(text) {
     const otherMatches = [...cleanText.matchAll(/(\d{2,3})[–—:.\s]+(\d{2,3})[–—:.\s]+(\d{2,3})/g)];
     for (const m of otherMatches) {
         const plate = m[1] + m[2] + m[3];
-        if (plate.length === 7 || plate.length === 8) {
+        if ((plate.length === 7 || plate.length === 8) && isValidIsraeliPlate(plate)) {
             // Check if not already found with dash
             const exists = formatted.some(f => f.num === plate);
             if (!exists) {
