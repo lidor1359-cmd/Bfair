@@ -307,14 +307,40 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         );
         const vehicleData = await vehicleResponse.json();
 
-        if (!vehicleData.success || vehicleData.result.records.length === 0) {
-            return res.status(404).json({
-                success: false,
-                error: 'לא נמצא רכב עם מספר זה'
-            });
-        }
+        let vehicle = null;
+        let isFromScrappedOnly = false;
 
-        const vehicle = vehicleData.result.records[0];
+        if (!vehicleData.success || vehicleData.result.records.length === 0) {
+            // Vehicle not in main registry - check if it's in scrapped vehicles
+            const scrappedCheckResponse = await fetch(
+                `https://data.gov.il/api/3/action/datastore_search?resource_id=${SCRAPPED_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
+            );
+            const scrappedCheckData = await scrappedCheckResponse.json();
+
+            if (scrappedCheckData.success && scrappedCheckData.result.records.length > 0) {
+                // Vehicle found in scrapped database - use its data
+                const scrappedRecord = scrappedCheckData.result.records[0];
+                vehicle = {
+                    mispar_rechev: scrappedRecord.mispar_rechev,
+                    tozeret_nm: scrappedRecord.tozeret_nm,
+                    kinuy_mishari: scrappedRecord.kinuy_mishari,
+                    shnat_yitzur: scrappedRecord.shnat_yitzur,
+                    tzeva_rechev: scrappedRecord.tzeva_rechev,
+                    sug_delek_nm: scrappedRecord.sug_delek_nm,
+                    baalut: scrappedRecord.baalut,
+                    misgeret: scrappedRecord.misgeret,
+                    moed_aliya_lakvish: scrappedRecord.moed_aliya_lakvish
+                };
+                isFromScrappedOnly = true;
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    error: 'לא נמצא רכב עם מספר זה'
+                });
+            }
+        } else {
+            vehicle = vehicleData.result.records[0];
+        }
 
         // 2. Get WLTP specs using tozeret_cd, degem_cd, and shnat_yitzur
         let wltpSpecs = null;
@@ -383,26 +409,50 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         }
 
         // 6. Check if vehicle is scrapped (removed from road)
-        let isScrapped = false;
+        let isScrapped = isFromScrappedOnly;
         let scrappedInfo = null;
-        const scrappedResponse = await fetch(
-            `https://data.gov.il/api/3/action/datastore_search?resource_id=${SCRAPPED_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
-        );
-        const scrappedData = await scrappedResponse.json();
-        if (scrappedData.success && scrappedData.result.records.length > 0) {
-            isScrapped = true;
-            const record = scrappedData.result.records[0];
-            scrappedInfo = {
-                bitul_dt: record.bitul_dt,
-                moed_aliya_lakvish: record.moed_aliya_lakvish,
-                shnat_yitzur: record.shnat_yitzur,
-                tozeret_nm: record.tozeret_nm,
-                kinuy_mishari: record.kinuy_mishari,
-                sug_delek_nm: record.sug_delek_nm,
-                tzeva_rechev: record.tzeva_rechev,
-                baalut: record.baalut,
-                misgeret: record.misgeret
-            };
+
+        if (isFromScrappedOnly) {
+            // Already checked when vehicle wasn't in main registry - fetch full details
+            const scrappedResponse = await fetch(
+                `https://data.gov.il/api/3/action/datastore_search?resource_id=${SCRAPPED_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
+            );
+            const scrappedData = await scrappedResponse.json();
+            if (scrappedData.success && scrappedData.result.records.length > 0) {
+                const record = scrappedData.result.records[0];
+                scrappedInfo = {
+                    bitul_dt: record.bitul_dt,
+                    moed_aliya_lakvish: record.moed_aliya_lakvish,
+                    shnat_yitzur: record.shnat_yitzur,
+                    tozeret_nm: record.tozeret_nm,
+                    kinuy_mishari: record.kinuy_mishari,
+                    sug_delek_nm: record.sug_delek_nm,
+                    tzeva_rechev: record.tzeva_rechev,
+                    baalut: record.baalut,
+                    misgeret: record.misgeret
+                };
+            }
+        } else {
+            // Check if active vehicle is also in scrapped database
+            const scrappedResponse = await fetch(
+                `https://data.gov.il/api/3/action/datastore_search?resource_id=${SCRAPPED_VEHICLES}&filters={"mispar_rechev":${plateNumber}}&limit=1`
+            );
+            const scrappedData = await scrappedResponse.json();
+            if (scrappedData.success && scrappedData.result.records.length > 0) {
+                isScrapped = true;
+                const record = scrappedData.result.records[0];
+                scrappedInfo = {
+                    bitul_dt: record.bitul_dt,
+                    moed_aliya_lakvish: record.moed_aliya_lakvish,
+                    shnat_yitzur: record.shnat_yitzur,
+                    tozeret_nm: record.tozeret_nm,
+                    kinuy_mishari: record.kinuy_mishari,
+                    sug_delek_nm: record.sug_delek_nm,
+                    tzeva_rechev: record.tzeva_rechev,
+                    baalut: record.baalut,
+                    misgeret: record.misgeret
+                };
+            }
         }
 
         // 7. Get recalls/safety issues
