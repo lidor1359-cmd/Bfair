@@ -494,6 +494,7 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                     taarich: dateStr
                 };
             });
+            console.log('Ownership history mapped:', JSON.stringify(ownershipHistory, null, 2));
             // Get last change date
             const lastRecord = ownershipData.result.records[ownershipData.result.records.length - 1];
             if (lastRecord.baalut_dt) {

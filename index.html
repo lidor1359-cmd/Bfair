@@ -559,6 +559,12 @@
                                 </span>
                             </div>`;
                         } else if (key === 'mispar_yadayim' && vehicle.historiat_baalut && vehicle.historiat_baalut.length > 0) {
+                            console.log('DEBUG mispar_yadayim - showing detailed history:', {
+                                key: key,
+                                hasHistoriat: !!vehicle.historiat_baalut,
+                                length: vehicle.historiat_baalut?.length,
+                                data: vehicle.historiat_baalut
+                            });
                             // Filter out dealer records (סוחר) - they don't count as hands
                             const realOwners = vehicle.historiat_baalut.filter(r => r.sug_baalut !== 'סוחר');
                             const realCount = realOwners.length;
@@ -593,6 +599,17 @@
 
                             historyHTML += `</tbody></table></div></div>`;
                             items += historyHTML;
+                        } else if (key === 'mispar_yadayim') {
+                            console.log('DEBUG mispar_yadayim - NO detailed history (condition not met):', {
+                                key: key,
+                                hasHistoriat: !!vehicle.historiat_baalut,
+                                length: vehicle.historiat_baalut?.length,
+                                data: vehicle.historiat_baalut
+                            });
+                            items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
+                                <span class="text-sm text-gray-400">${label}</span>
+                                <span class="font-medium text-sm text-white">${displayValue}</span>
+                            </div>`;
                         } else {
                             items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
                                 <span class="text-sm text-gray-400">${label}</span>
