@@ -474,13 +474,25 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
         let ownershipCount = 0;
         let lastOwnershipChange = null;
         let ownershipHistory = [];
+        console.log('[DEBUG] Fetching ownership history for plate:', plateNumber);
         const ownershipResponse = await fetch(
             `https://data.gov.il/api/3/action/datastore_search?resource_id=${OWNERSHIP_HISTORY}&filters={"mispar_rechev":${plateNumber}}&sort=baalut_dt asc`
         );
         const ownershipData = await ownershipResponse.json();
+        console.log('[DEBUG] Ownership API response:', {
+            success: ownershipData.success,
+            recordCount: ownershipData.result?.records?.length || 0,
+            records: ownershipData.result?.records || []
+        });
+
         if (ownershipData.success && ownershipData.result.records.length > 0) {
-            ownershipCount = ownershipData.result.records.length;
-            ownershipHistory = ownershipData.result.records.map((record, index) => {
+            // Filter out dealers (סוחר) before counting
+            const nonDealerRecords = ownershipData.result.records.filter(
+                record => record.baalut !== 'סוחר'
+            );
+
+            ownershipCount = nonDealerRecords.length;
+            ownershipHistory = nonDealerRecords.map((record, index) => {
                 let dateStr = null;
                 if (record.baalut_dt) {
                     const dtStr = record.baalut_dt.toString();
@@ -494,14 +506,25 @@ app.get('/api/vehicle/:plateNumber', async (req, res) => {
                     taarich: dateStr
                 };
             });
-            // Get last change date
-            const lastRecord = ownershipData.result.records[ownershipData.result.records.length - 1];
-            if (lastRecord.baalut_dt) {
-                const dtStr = lastRecord.baalut_dt.toString();
-                const year = dtStr.substring(0, 4);
-                const month = dtStr.substring(4, 6);
-                lastOwnershipChange = `${month}/${year}`;
+
+            console.log('[DEBUG] Processed ownership history:', {
+                totalRecords: ownershipData.result.records.length,
+                nonDealerCount: ownershipCount,
+                ownershipHistory: ownershipHistory
+            });
+
+            // Get last change date from non-dealer records
+            if (nonDealerRecords.length > 0) {
+                const lastRecord = nonDealerRecords[nonDealerRecords.length - 1];
+                if (lastRecord.baalut_dt) {
+                    const dtStr = lastRecord.baalut_dt.toString();
+                    const year = dtStr.substring(0, 4);
+                    const month = dtStr.substring(4, 6);
+                    lastOwnershipChange = `${month}/${year}`;
+                }
             }
+        } else {
+            console.log('[DEBUG] No ownership records found or API call failed');
         }
 
         // 5. Check if vehicle is inactive (expired license)
