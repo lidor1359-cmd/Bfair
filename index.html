@@ -559,21 +559,11 @@
                                 </span>
                             </div>`;
                         } else if (key === 'mispar_yadayim' && vehicle.historiat_baalut && vehicle.historiat_baalut.length > 0) {
-                            console.log('DEBUG mispar_yadayim - showing detailed history:', {
-                                key: key,
-                                hasHistoriat: !!vehicle.historiat_baalut,
-                                length: vehicle.historiat_baalut?.length,
-                                data: vehicle.historiat_baalut
-                            });
-                            // Filter out dealer records (סוחר) - they don't count as hands
-                            const realOwners = vehicle.historiat_baalut.filter(r => r.sug_baalut !== 'סוחר');
-                            const realCount = realOwners.length;
-
-                            // Display ownership count with detailed history (excluding dealers)
+                            // Display ownership count with full detailed history
                             let historyHTML = `<div class="py-2 border-b border-white/5 last:border-0">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-sm text-gray-400">${label}</span>
-                                    <span class="font-medium text-sm text-white">${realCount}</span>
+                                    <span class="font-medium text-sm text-white">${vehicle.historiat_baalut.length}</span>
                                 </div>
                                 <div class="mt-2 bg-white/5 rounded-lg p-2">
                                     <table class="w-full text-sm">
@@ -586,30 +576,19 @@
                                         </thead>
                                         <tbody>`;
 
-                            // Display only real owners (excluding dealers)
-                            let yadCounter = 1;
-                            for (const record of realOwners) {
+                            // Display all ownership records
+                            for (const record of vehicle.historiat_baalut) {
+                                const isDealer = record.sug_baalut === 'סוחר';
+                                const ownerTypeColor = isDealer ? 'text-gray-500' : 'text-[#BF953F]';
                                 historyHTML += `<tr class="border-t border-white/5">
-                                    <td class="py-1 text-white">${yadCounter}</td>
-                                    <td class="py-1 text-[#BF953F]">${record.sug_baalut || '-'}</td>
+                                    <td class="py-1 text-white">${record.yad}</td>
+                                    <td class="py-1 ${ownerTypeColor}">${record.sug_baalut || '-'}</td>
                                     <td class="py-1 text-gray-300">${record.taarich || '-'}</td>
                                 </tr>`;
-                                yadCounter++;
                             }
 
                             historyHTML += `</tbody></table></div></div>`;
                             items += historyHTML;
-                        } else if (key === 'mispar_yadayim') {
-                            console.log('DEBUG mispar_yadayim - NO detailed history (condition not met):', {
-                                key: key,
-                                hasHistoriat: !!vehicle.historiat_baalut,
-                                length: vehicle.historiat_baalut?.length,
-                                data: vehicle.historiat_baalut
-                            });
-                            items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
-                                <span class="text-sm text-gray-400">${label}</span>
-                                <span class="font-medium text-sm text-white">${displayValue}</span>
-                            </div>`;
                         } else {
                             items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
                                 <span class="text-sm text-gray-400">${label}</span>
