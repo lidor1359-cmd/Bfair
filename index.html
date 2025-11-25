@@ -558,37 +558,54 @@
                                     <span class="material-symbols-outlined text-base">${icon}</span>${displayValue}
                                 </span>
                             </div>`;
-                        } else if (key === 'mispar_yadayim' && vehicle.historiat_baalut && vehicle.historiat_baalut.length > 0) {
-                            // Display ownership count with full detailed history
-                            let historyHTML = `<div class="py-2 border-b border-white/5 last:border-0">
-                                <div class="flex justify-between items-center mb-2">
+                        } else if (key === 'mispar_yadayim') {
+                            // Always display ownership history table when mispar_yadayim exists
+                            console.log('[DEBUG] Processing mispar_yadayim:', {
+                                value: value,
+                                hasHistoriat: !!vehicle.historiat_baalut,
+                                historiatLength: vehicle.historiat_baalut?.length,
+                                fullVehicle: vehicle
+                            });
+
+                            if (vehicle.historiat_baalut && Array.isArray(vehicle.historiat_baalut) && vehicle.historiat_baalut.length > 0) {
+                                // Display ownership count with full detailed history
+                                let historyHTML = `<div class="py-2 border-b border-white/5 last:border-0">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm text-gray-400">${label}</span>
+                                        <span class="font-medium text-sm text-white">${vehicle.historiat_baalut.length}</span>
+                                    </div>
+                                    <div class="mt-2 bg-white/5 rounded-lg p-2">
+                                        <table class="w-full text-sm">
+                                            <thead>
+                                                <tr class="text-gray-500 text-xs">
+                                                    <th class="text-right pb-1">יד</th>
+                                                    <th class="text-right pb-1">סוג בעלות</th>
+                                                    <th class="text-right pb-1">תאריך</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>`;
+
+                                // Display all ownership records
+                                for (const record of vehicle.historiat_baalut) {
+                                    const isDealer = record.sug_baalut === 'סוחר';
+                                    const ownerTypeColor = isDealer ? 'text-gray-500' : 'text-[#BF953F]';
+                                    historyHTML += `<tr class="border-t border-white/5">
+                                        <td class="py-1 text-white">${record.yad}</td>
+                                        <td class="py-1 ${ownerTypeColor}">${record.sug_baalut || '-'}</td>
+                                        <td class="py-1 text-gray-300">${record.taarich || '-'}</td>
+                                    </tr>`;
+                                }
+
+                                historyHTML += `</tbody></table></div></div>`;
+                                items += historyHTML;
+                            } else {
+                                // Fallback: show simple display if historiat_baalut is missing
+                                console.warn('[DEBUG] historiat_baalut missing or empty for vehicle');
+                                items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
                                     <span class="text-sm text-gray-400">${label}</span>
-                                    <span class="font-medium text-sm text-white">${vehicle.historiat_baalut.length}</span>
-                                </div>
-                                <div class="mt-2 bg-white/5 rounded-lg p-2">
-                                    <table class="w-full text-sm">
-                                        <thead>
-                                            <tr class="text-gray-500 text-xs">
-                                                <th class="text-right pb-1">יד</th>
-                                                <th class="text-right pb-1">סוג בעלות</th>
-                                                <th class="text-right pb-1">תאריך</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>`;
-
-                            // Display all ownership records
-                            for (const record of vehicle.historiat_baalut) {
-                                const isDealer = record.sug_baalut === 'סוחר';
-                                const ownerTypeColor = isDealer ? 'text-gray-500' : 'text-[#BF953F]';
-                                historyHTML += `<tr class="border-t border-white/5">
-                                    <td class="py-1 text-white">${record.yad}</td>
-                                    <td class="py-1 ${ownerTypeColor}">${record.sug_baalut || '-'}</td>
-                                    <td class="py-1 text-gray-300">${record.taarich || '-'}</td>
-                                </tr>`;
+                                    <span class="font-medium text-sm text-white">${displayValue}</span>
+                                </div>`;
                             }
-
-                            historyHTML += `</tbody></table></div></div>`;
-                            items += historyHTML;
                         } else {
                             items += `<div class="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
                                 <span class="text-sm text-gray-400">${label}</span>
